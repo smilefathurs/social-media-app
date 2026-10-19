@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useAppSelector } from "@/lib/redux/hooks";
 import { useFeedQuery } from "@/features/posts/posts.hooks";
 import PostCard from "@/features/posts/components/PostCard";
+import UserSearch from "@/features/users/components/UserSearch";
 
 export default function Home() {
   const user = useAppSelector((state) => state.auth.user);
@@ -61,6 +62,8 @@ export default function Home() {
               Temukan cerita dan kabar terbaru dari komunitasmu.
             </p>
           </div>
+
+          {isAuthenticated && <UserSearch />}
 
           {!isAuthenticated && (
             <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-900 dark:bg-blue-950">
@@ -135,3 +138,5 @@ export default function Home() {
     </main>
   );
 }
+
+
