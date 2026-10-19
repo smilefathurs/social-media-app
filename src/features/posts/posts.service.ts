@@ -1,0 +1,69 @@
+﻿import api from "@/lib/api";
+import type { FeedResponse } from "./posts.types";
+
+export interface FeedParams {
+  page?: number;
+  limit?: number;
+}
+
+export async function getFeed(
+  params: FeedParams = {},
+): Promise<FeedResponse> {
+  const response = await api.get<FeedResponse>("/api/feed", {
+    params: {
+      page: params.page ?? 1,
+      limit: params.limit ?? 20,
+    },
+  });
+
+  return response.data;
+}
+
+export async function likePost(postId: number): Promise<void> {
+  await api.post(`/api/posts/${postId}/like`);
+}
+
+export async function unlikePost(postId: number): Promise<void> {
+  await api.delete(`/api/posts/${postId}/like`);
+}
+
+import type {
+  CommentsParams,
+  CommentsResponse,
+  CommentResponse,
+} from "./posts.types";
+
+export async function getPostComments(
+  postId: number,
+  params: CommentsParams = {},
+): Promise<CommentsResponse> {
+  const response = await api.get<CommentsResponse>(
+    `/api/posts/${postId}/comments`,
+    {
+      params: {
+        page: params.page ?? 1,
+        limit: params.limit ?? 10,
+      },
+    },
+  );
+
+  return response.data;
+}
+
+export async function addPostComment(
+  postId: number,
+  text: string,
+): Promise<CommentResponse> {
+  const response = await api.post<CommentResponse>(
+    `/api/posts/${postId}/comments`,
+    { text },
+  );
+
+  return response.data;
+}
+
+export async function deletePostComment(
+  commentId: number,
+): Promise<void> {
+  await api.delete(`/api/comments/${commentId}`);
+}
