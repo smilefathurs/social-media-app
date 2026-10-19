@@ -1,5 +1,6 @@
 ﻿"use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import { useLikeMutation, useUnlikeMutation } from "../posts.hooks";
 import type { Post } from "../posts.types";
@@ -24,6 +25,8 @@ function formatPostDate(value: string): string {
 
 export default function PostCard({ post }: PostCardProps) {
   const authorName = post.author.name || post.author.username;
+  const [isCommentsOpen, setIsCommentsOpen] = useState(false);
+
   const likeMutation = useLikeMutation();
   const unlikeMutation = useUnlikeMutation();
   const isLikePending = likeMutation.isPending || unlikeMutation.isPending;
@@ -113,18 +116,33 @@ export default function PostCard({ post }: PostCardProps) {
           <span>{post.likeCount}</span>
         </button>
 
-        <span aria-label={`${post.commentCount} komentar`}>
-          ◯ {post.commentCount} komentar
-        </span>
+        <button
+          type="button"
+          onClick={() => setIsCommentsOpen((previous) => !previous)}
+          aria-expanded={isCommentsOpen}
+          aria-controls={`post-comments-${post.id}`}
+          className="inline-flex items-center gap-2 rounded-md transition-colors hover:text-blue-600 dark:hover:text-blue-400"
+        >
+          <span aria-hidden="true">◯</span>
+          <span>{post.commentCount} komentar</span>
+          <span aria-hidden="true">{isCommentsOpen ? "▲" : "▼"}</span>
+        </button>
       </div>
 
       {(likeMutation.isError || unlikeMutation.isError) && (
-        <p role="alert" className="px-4 pb-3 text-sm text-red-600 dark:text-red-400">
+        <p
+          role="alert"
+          className="px-4 pb-3 text-sm text-red-600 dark:text-red-400"
+        >
           Gagal memperbarui Like. Silakan coba lagi.
         </p>
       )}
-      <PostComments postId={post.id} />
+
+      {isCommentsOpen && (
+        <div id={`post-comments-${post.id}`}>
+          <PostComments postId={post.id} />
+        </div>
+      )}
     </article>
   );
 }
-
