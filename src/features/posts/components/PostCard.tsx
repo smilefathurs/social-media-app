@@ -3,7 +3,12 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useLikeMutation, useUnlikeMutation } from '../posts.hooks';
+import {
+  useDeletePostMutation,
+  useLikeMutation,
+  useUnlikeMutation,
+} from '../posts.hooks';
+import { useAppSelector } from '@/lib/redux/hooks';
 import type { Post } from '../posts.types';
 import PostComments from './PostComments';
 
@@ -27,6 +32,23 @@ function formatPostDate(value: string): string {
 export default function PostCard({ post }: PostCardProps) {
   const authorName = post.author.name || post.author.username;
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
+
+  const user = useAppSelector((state) => state.auth.user);
+  const deleteMutation = useDeletePostMutation();
+
+  const isOwner = user?.id === post.author.id;
+
+  function handleDeletePost() {
+    if (!isOwner || deleteMutation.isPending) return;
+
+    const confirmed = window.confirm(
+      'Apakah kamu yakin ingin menghapus postingan ini?'
+    );
+
+    if (confirmed) {
+      deleteMutation.mutate(post.id);
+    }
+  }
 
   const likeMutation = useLikeMutation();
   const unlikeMutation = useUnlikeMutation();
@@ -88,6 +110,16 @@ export default function PostCard({ post }: PostCardProps) {
             {formatPostDate(post.createdAt)}
           </time>
         </div>
+        {isOwner && (
+          <button
+            type='button'
+            onClick={handleDeletePost}
+            disabled={deleteMutation.isPending}
+            className='rounded-md px-3 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60 dark:hover:bg-red-950'
+          >
+            {deleteMutation.isPending ? 'Menghapus...' : 'Hapus'}
+          </button>
+        )}
       </div>
 
       {post.caption && (
@@ -152,6 +184,15 @@ export default function PostCard({ post }: PostCardProps) {
           className='px-4 pb-3 text-sm text-red-600 dark:text-red-400'
         >
           Gagal memperbarui Like. Silakan coba lagi.
+        </p>
+      )}
+
+      {deleteMutation.isError && (
+        <p
+          role='alert'
+          className='px-4 pb-3 text-sm text-red-600 dark:text-red-400'
+        >
+          Gagal menghapus postingan. Silakan coba lagi.
         </p>
       )}
 

@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   addPostComment,
   createPost,
+  deletePost,
   deletePostComment,
   getPostComments,
   getFeed,
@@ -93,6 +94,20 @@ export function useCreatePostMutation() {
   return useMutation({
     mutationFn: ({ image, caption }: { image: File; caption: string }) =>
       createPost(image, caption),
+
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ['feed'],
+      });
+    },
+  });
+}
+
+export function useDeletePostMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (postId: number) => deletePost(postId),
 
     onSuccess: async () => {
       await queryClient.invalidateQueries({

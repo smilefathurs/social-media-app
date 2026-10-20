@@ -72,3 +72,7 @@ export async function createPost(image: File, caption: string): Promise<void> {
 
   await api.post('/api/posts', formData);
 }
+
+export async function deletePost(postId: number): Promise<void> {
+  await api.delete(`/api/posts/${postId}`);
+}
