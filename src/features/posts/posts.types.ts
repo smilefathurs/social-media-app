@@ -1,4 +1,4 @@
-﻿export interface PostAuthor {
+export interface PostAuthor {
   id: number;
   username: string;
   name: string;
@@ -57,3 +57,28 @@ export interface CommentsParams {
   limit?: number;
 }
 
+export interface SavedPostsParams {
+  page?: number;
+  limit?: number;
+}
+
+export interface SavedPost {
+  id: number;
+  imageUrl: string | null;
+  caption: string;
+  createdAt: string;
+}
+
+export interface SavedPostsResponse {
+  success: boolean;
+  message: string;
+  data: {
+    posts: SavedPost[];
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+    };
+  };
+}

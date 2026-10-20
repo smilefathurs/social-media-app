@@ -1,5 +1,9 @@
-﻿import api from '@/lib/api';
-import type { FeedResponse } from './posts.types';
+import api from '@/lib/api';
+import type {
+  FeedResponse,
+  SavedPostsParams,
+  SavedPostsResponse,
+} from './posts.types';
 
 export interface FeedParams {
   page?: number;
@@ -75,4 +79,25 @@ export async function createPost(image: File, caption: string): Promise<void> {
 
 export async function deletePost(postId: number): Promise<void> {
   await api.delete(`/api/posts/${postId}`);
+}
+
+export const savePost = async (postId: number): Promise<void> => {
+  await api.post(`/api/posts/${postId}/save`);
+};
+
+export const unsavePost = async (postId: number): Promise<void> => {
+  await api.delete(`/api/posts/${postId}/save`);
+};
+
+export async function getSavedPosts(
+  params: SavedPostsParams = {}
+): Promise<SavedPostsResponse> {
+  const response = await api.get<SavedPostsResponse>('/api/me/saved', {
+    params: {
+      page: params.page ?? 1,
+      limit: params.limit ?? 20,
+    },
+  });
+
+  return response.data;
 }

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import Image from 'next/image';
@@ -7,6 +7,9 @@ import {
   useDeletePostMutation,
   useLikeMutation,
   useUnlikeMutation,
+  useSavePostMutation,
+  useUnsavePostMutation,
+  useSavedPostsQuery,
 } from '../posts.hooks';
 import { useAppSelector } from '@/lib/redux/hooks';
 import type { Post } from '../posts.types';
@@ -61,6 +64,28 @@ export default function PostCard({ post }: PostCardProps) {
       unlikeMutation.mutate(post.id);
     } else {
       likeMutation.mutate(post.id);
+    }
+  }
+
+  const saveMutation = useSavePostMutation();
+  const unsaveMutation = useUnsavePostMutation();
+
+  const isSavePending = saveMutation.isPending || unsaveMutation.isPending;
+
+  const savedPostsQuery = useSavedPostsQuery();
+
+  const isSaved =
+    savedPostsQuery.data?.data?.posts?.some(
+      (savedPost) => savedPost.id === post.id
+    ) ?? false;
+
+  function handleSaveToggle() {
+    if (isSavePending) return;
+
+    if (isSaved) {
+      unsaveMutation.mutate(post.id);
+    } else {
+      saveMutation.mutate(post.id);
     }
   }
 
@@ -154,7 +179,7 @@ export default function PostCard({ post }: PostCardProps) {
               : 'hover:text-red-600 dark:hover:text-red-400'
           }`}
         >
-          <span aria-hidden='true'>{post.likedByMe ? '♥' : '♡'}</span>
+          <span aria-hidden='true'>{post.likedByMe ? '[LIKED]' : '[LIKE]'}</span>
           <span>
             {isLikePending
               ? 'Memproses...'
@@ -172,9 +197,27 @@ export default function PostCard({ post }: PostCardProps) {
           aria-controls={`post-comments-${post.id}`}
           className='inline-flex items-center gap-2 rounded-md transition-colors hover:text-blue-600 dark:hover:text-blue-400'
         >
-          <span aria-hidden='true'>◯</span>
+          <span aria-hidden='true'>[COMMENT]</span>
           <span>{post.commentCount} komentar</span>
-          <span aria-hidden='true'>{isCommentsOpen ? '▲' : '▼'}</span>
+          <span aria-hidden='true'>{isCommentsOpen ? '[-]' : '[+]'}</span>
+        </button>
+
+        <button
+          type='button'
+          onClick={handleSaveToggle}
+          disabled={isSavePending}
+          aria-pressed={isSaved}
+          aria-label={isSaved ? 'Hapus dari Saved Posts' : 'Simpan postingan'}
+          className={`inline-flex items-center gap-2 rounded-md transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
+            isSaved
+              ? 'font-semibold text-blue-600 dark:text-blue-400'
+              : 'hover:text-blue-600 dark:hover:text-blue-400'
+          }`}
+        >
+          <span aria-hidden='true'>{isSaved ? '[SAVED]' : '[SAVE]'}</span>
+          <span>
+            {isSavePending ? 'Memproses...' : isSaved ? 'Tersimpan' : 'Simpan'}
+          </span>
         </button>
       </div>
 
@@ -184,6 +227,15 @@ export default function PostCard({ post }: PostCardProps) {
           className='px-4 pb-3 text-sm text-red-600 dark:text-red-400'
         >
           Gagal memperbarui Like. Silakan coba lagi.
+        </p>
+      )}
+
+      {(saveMutation.isError || unsaveMutation.isError) && (
+        <p
+          role='alert'
+          className='px-4 pb-3 text-sm text-red-600 dark:text-red-400'
+        >
+          Gagal menyimpan perubahan. Silakan coba lagi.
         </p>
       )}
 

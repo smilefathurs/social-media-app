@@ -10,6 +10,9 @@ import {
   getFeed,
   likePost,
   unlikePost,
+  getSavedPosts,
+  savePost,
+  unsavePost,
   type FeedParams,
 } from './posts.service';
 import type { CommentsParams } from './posts.types';
@@ -113,6 +116,42 @@ export function useDeletePostMutation() {
       await queryClient.invalidateQueries({
         queryKey: ['feed'],
       });
+    },
+  });
+}
+
+export function useSavedPostsQuery(params: FeedParams = {}, enabled = true) {
+  return useQuery({
+    queryKey: ['saved-posts', params.page ?? 1, params.limit ?? 20],
+    queryFn: () => getSavedPosts(params),
+    enabled,
+  });
+}
+
+export function useSavePostMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (postId: number) => savePost(postId),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['saved-posts'] }),
+        queryClient.invalidateQueries({ queryKey: ['feed'] }),
+      ]);
+    },
+  });
+}
+
+export function useUnsavePostMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (postId: number) => unsavePost(postId),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['saved-posts'] }),
+        queryClient.invalidateQueries({ queryKey: ['feed'] }),
+      ]);
     },
   });
 }
