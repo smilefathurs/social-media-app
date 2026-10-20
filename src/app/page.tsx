@@ -62,9 +62,12 @@ export default function Home() {
               Home Feed
             </div>
             <div className='rounded-lg px-3 py-2 text-gray-500'>Explore</div>
-            <div className='rounded-lg px-3 py-2 text-gray-500'>
+            <Link
+              href='/saved'
+              className='block rounded-lg px-3 py-2 text-gray-600 transition-colors hover:bg-blue-50 hover:text-blue-700 dark:text-gray-300 dark:hover:bg-blue-950 dark:hover:text-blue-300'
+            >
               Saved Posts
-            </div>
+            </Link>
             <div className='rounded-lg px-3 py-2 text-gray-500'>Profile</div>
           </div>
         </aside>
