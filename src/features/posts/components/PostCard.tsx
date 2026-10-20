@@ -1,10 +1,11 @@
-﻿"use client";
+﻿'use client';
 
-import { useState } from "react";
-import Image from "next/image";
-import { useLikeMutation, useUnlikeMutation } from "../posts.hooks";
-import type { Post } from "../posts.types";
-import PostComments from "./PostComments";
+import { useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useLikeMutation, useUnlikeMutation } from '../posts.hooks';
+import type { Post } from '../posts.types';
+import PostComments from './PostComments';
 
 interface PostCardProps {
   post: Post;
@@ -17,9 +18,9 @@ function formatPostDate(value: string): string {
     return value;
   }
 
-  return new Intl.DateTimeFormat("id-ID", {
-    dateStyle: "medium",
-    timeStyle: "short",
+  return new Intl.DateTimeFormat('id-ID', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
   }).format(date);
 }
 
@@ -42,31 +43,47 @@ export default function PostCard({ post }: PostCardProps) {
   }
 
   return (
-    <article className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
-      <div className="flex items-center gap-3 p-4">
-        {post.author.avatarUrl ? (
-          <Image
-            src={post.author.avatarUrl}
-            alt={`Avatar ${authorName}`}
-            width={44}
-            height={44}
-            unoptimized
-            className="size-11 rounded-full object-cover"
-          />
-        ) : (
-          <div className="flex size-11 shrink-0 items-center justify-center rounded-full bg-blue-100 font-semibold text-blue-700 dark:bg-blue-950 dark:text-blue-300">
-            {authorName.charAt(0).toUpperCase()}
-          </div>
-        )}
+    <article className='overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900'>
+      <div className='flex items-center gap-3 p-4'>
+        <Link
+          href={`/users/${encodeURIComponent(post.author.username)}`}
+          className='shrink-0 rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600'
+          aria-label={`Lihat profil ${authorName}`}
+        >
+          {post.author.avatarUrl ? (
+            <Image
+              src={post.author.avatarUrl}
+              alt={`Avatar ${authorName}`}
+              width={44}
+              height={44}
+              unoptimized
+              className='size-11 rounded-full object-cover'
+            />
+          ) : (
+            <div className='flex size-11 items-center justify-center rounded-full bg-blue-100 font-semibold text-blue-700 dark:bg-blue-950 dark:text-blue-300'>
+              {authorName.charAt(0).toUpperCase()}
+            </div>
+          )}
+        </Link>
 
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold">{authorName}</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
+        <div className='min-w-0 flex-1'>
+          <Link
+            href={`/users/${encodeURIComponent(post.author.username)}`}
+            className='block truncate text-sm font-semibold hover:text-blue-600 dark:hover:text-blue-400'
+          >
+            {authorName}
+          </Link>
+
+          <Link
+            href={`/users/${encodeURIComponent(post.author.username)}`}
+            className='block truncate text-xs text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400'
+          >
             @{post.author.username}
-          </p>
+          </Link>
+
           <time
             dateTime={post.createdAt}
-            className="text-xs text-gray-500 dark:text-gray-400"
+            className='text-xs text-gray-500 dark:text-gray-400'
           >
             {formatPostDate(post.createdAt)}
           </time>
@@ -74,65 +91,65 @@ export default function PostCard({ post }: PostCardProps) {
       </div>
 
       {post.caption && (
-        <p className="whitespace-pre-wrap break-words px-4 pb-4 text-sm leading-6">
+        <p className='whitespace-pre-wrap break-words px-4 pb-4 text-sm leading-6'>
           {post.caption}
         </p>
       )}
 
       {post.imageUrl && (
-        <div className="relative flex max-h-[600px] justify-center overflow-hidden bg-gray-100 dark:bg-gray-950">
+        <div className='relative flex max-h-[600px] justify-center overflow-hidden bg-gray-100 dark:bg-gray-950'>
           <Image
             src={post.imageUrl}
             alt={`Postingan oleh ${authorName}`}
             width={1200}
             height={1200}
             unoptimized
-            className="h-auto max-h-[600px] w-full object-contain"
+            className='h-auto max-h-[600px] w-full object-contain'
           />
         </div>
       )}
 
-      <div className="flex flex-wrap items-center gap-5 border-t border-gray-100 px-4 py-3 text-sm text-gray-500 dark:border-gray-800 dark:text-gray-400">
+      <div className='flex flex-wrap items-center gap-5 border-t border-gray-100 px-4 py-3 text-sm text-gray-500 dark:border-gray-800 dark:text-gray-400'>
         <button
-          type="button"
+          type='button'
           onClick={handleLikeToggle}
           disabled={isLikePending}
           aria-pressed={post.likedByMe}
-          aria-label={post.likedByMe ? "Batalkan suka" : "Sukai postingan"}
+          aria-label={post.likedByMe ? 'Batalkan suka' : 'Sukai postingan'}
           className={`inline-flex items-center gap-2 rounded-md transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
             post.likedByMe
-              ? "font-semibold text-red-600 dark:text-red-400"
-              : "hover:text-red-600 dark:hover:text-red-400"
+              ? 'font-semibold text-red-600 dark:text-red-400'
+              : 'hover:text-red-600 dark:hover:text-red-400'
           }`}
         >
-          <span aria-hidden="true">{post.likedByMe ? "♥" : "♡"}</span>
+          <span aria-hidden='true'>{post.likedByMe ? '♥' : '♡'}</span>
           <span>
             {isLikePending
-              ? "Memproses..."
+              ? 'Memproses...'
               : post.likedByMe
-                ? "Disukai"
-                : "Suka"}
+                ? 'Disukai'
+                : 'Suka'}
           </span>
           <span>{post.likeCount}</span>
         </button>
 
         <button
-          type="button"
+          type='button'
           onClick={() => setIsCommentsOpen((previous) => !previous)}
           aria-expanded={isCommentsOpen}
           aria-controls={`post-comments-${post.id}`}
-          className="inline-flex items-center gap-2 rounded-md transition-colors hover:text-blue-600 dark:hover:text-blue-400"
+          className='inline-flex items-center gap-2 rounded-md transition-colors hover:text-blue-600 dark:hover:text-blue-400'
         >
-          <span aria-hidden="true">◯</span>
+          <span aria-hidden='true'>◯</span>
           <span>{post.commentCount} komentar</span>
-          <span aria-hidden="true">{isCommentsOpen ? "▲" : "▼"}</span>
+          <span aria-hidden='true'>{isCommentsOpen ? '▲' : '▼'}</span>
         </button>
       </div>
 
       {(likeMutation.isError || unlikeMutation.isError) && (
         <p
-          role="alert"
-          className="px-4 pb-3 text-sm text-red-600 dark:text-red-400"
+          role='alert'
+          className='px-4 pb-3 text-sm text-red-600 dark:text-red-400'
         >
           Gagal memperbarui Like. Silakan coba lagi.
         </p>
