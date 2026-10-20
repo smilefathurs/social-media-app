@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import Image from 'next/image';
 import Link from 'next/link';
@@ -7,6 +7,7 @@ import {
   useFollowUserMutation,
   useUnfollowUserMutation,
 } from '@/features/users/users.hooks';
+import EditProfileForm from '@/features/users/components/EditProfileForm';
 import {
   useUserPostsQuery,
   useUserProfileQuery,
@@ -127,6 +128,8 @@ export default function UserProfilePage() {
                   {profile.bio}
                 </p>
               )}
+
+              {profile.isMe && <EditProfileForm profile={profile} />}
 
               {!profile.isMe && (
                 <button
