@@ -1,15 +1,13 @@
-﻿import api from "@/lib/api";
-import type { FeedResponse } from "./posts.types";
+﻿import api from '@/lib/api';
+import type { FeedResponse } from './posts.types';
 
 export interface FeedParams {
   page?: number;
   limit?: number;
 }
 
-export async function getFeed(
-  params: FeedParams = {},
-): Promise<FeedResponse> {
-  const response = await api.get<FeedResponse>("/api/feed", {
+export async function getFeed(params: FeedParams = {}): Promise<FeedResponse> {
+  const response = await api.get<FeedResponse>('/api/feed', {
     params: {
       page: params.page ?? 1,
       limit: params.limit ?? 20,
@@ -31,11 +29,11 @@ import type {
   CommentsParams,
   CommentsResponse,
   CommentResponse,
-} from "./posts.types";
+} from './posts.types';
 
 export async function getPostComments(
   postId: number,
-  params: CommentsParams = {},
+  params: CommentsParams = {}
 ): Promise<CommentsResponse> {
   const response = await api.get<CommentsResponse>(
     `/api/posts/${postId}/comments`,
@@ -44,7 +42,7 @@ export async function getPostComments(
         page: params.page ?? 1,
         limit: params.limit ?? 10,
       },
-    },
+    }
   );
 
   return response.data;
@@ -52,18 +50,25 @@ export async function getPostComments(
 
 export async function addPostComment(
   postId: number,
-  text: string,
+  text: string
 ): Promise<CommentResponse> {
   const response = await api.post<CommentResponse>(
     `/api/posts/${postId}/comments`,
-    { text },
+    { text }
   );
 
   return response.data;
 }
 
-export async function deletePostComment(
-  commentId: number,
-): Promise<void> {
+export async function deletePostComment(commentId: number): Promise<void> {
   await api.delete(`/api/comments/${commentId}`);
+}
+
+export async function createPost(image: File, caption: string): Promise<void> {
+  const formData = new FormData();
+
+  formData.append('image', image);
+  formData.append('caption', caption);
+
+  await api.post('/api/posts', formData);
 }

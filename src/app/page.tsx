@@ -5,6 +5,7 @@ import { useAppSelector } from '@/lib/redux/hooks';
 import { useFeedQuery } from '@/features/posts/posts.hooks';
 import PostCard from '@/features/posts/components/PostCard';
 import UserSearch from '@/features/users/components/UserSearch';
+import CreatePostForm from '@/features/posts/components/CreatePostForm';
 
 export default function Home() {
   const user = useAppSelector((state) => state.auth.user);
@@ -95,14 +96,7 @@ export default function Home() {
 
           {isAuthenticated && (
             <>
-              <div className='rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900'>
-                <h2 className='font-semibold'>
-                  Apa yang sedang kamu pikirkan?
-                </h2>
-                <p className='mt-2 text-sm text-gray-500 dark:text-gray-400'>
-                  Fitur membuat postingan akan kita integrasikan berikutnya.
-                </p>
-              </div>
+              <CreatePostForm />
 
               {feedQuery.isPending && (
                 <div className='rounded-xl border border-gray-200 bg-white p-6 text-sm text-gray-500 dark:border-gray-800 dark:bg-gray-900'>
