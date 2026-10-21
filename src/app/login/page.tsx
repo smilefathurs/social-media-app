@@ -1,15 +1,69 @@
-﻿"use client";
+﻿'use client';
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { loginSchema, type LoginFormValues } from "@/features/auth/auth.schema";
-import { useLoginMutation } from "@/features/auth/auth.hooks";
+import { useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { loginSchema, type LoginFormValues } from '@/features/auth/auth.schema';
+import { useLoginMutation } from '@/features/auth/auth.hooks';
+
+function SocialityLogo() {
+  return (
+    <div className='flex items-center justify-center gap-3'>
+      <svg
+        viewBox='0 0 40 40'
+        className='h-9 w-9 shrink-0 text-white'
+        fill='none'
+        aria-hidden='true'
+      >
+        {Array.from({ length: 16 }, (_, i) => (
+          <line
+            key={i}
+            x1='20'
+            y1='3'
+            x2='20'
+            y2='13'
+            stroke='currentColor'
+            strokeWidth='2.5'
+            strokeLinecap='round'
+            transform={`rotate(${i * 22.5} 20 20)`}
+          />
+        ))}
+      </svg>
+
+      <span className='text-2xl font-bold tracking-tight text-white'>
+        Sociality
+      </span>
+    </div>
+  );
+}
+
+function EyeIcon({ visible }: { visible: boolean }) {
+  return (
+    <svg
+      viewBox='0 0 24 24'
+      fill='none'
+      stroke='currentColor'
+      strokeWidth='2'
+      className='h-5 w-5'
+      aria-hidden='true'
+    >
+      <path
+        strokeLinecap='round'
+        strokeLinejoin='round'
+        d='M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7Z'
+      />
+      <circle cx='12' cy='12' r='3' />
+      {visible && <path strokeLinecap='round' d='M4 4 20 20' />}
+    </svg>
+  );
+}
 
 export default function LoginPage() {
   const router = useRouter();
   const loginMutation = useLoginMutation();
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -18,8 +72,8 @@ export default function LoginPage() {
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "",
-      password: "",
+      email: '',
+      password: '',
     },
   });
 
@@ -27,73 +81,142 @@ export default function LoginPage() {
     loginMutation.mutate(values, {
       onSuccess: (response) => {
         if (response.success) {
-          router.push("/");
+          router.push('/');
         }
       },
     });
   };
 
-  return (
-    <main className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-10 dark:bg-gray-950">
-      <section className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-8 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
-            Social Media App
-          </h1>
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-            Masuk untuk melanjutkan
-          </p>
-        </div>
+  const inputClass = (hasError: boolean) =>
+    `w-full rounded-xl border bg-[#0b0e13] px-4 py-3 text-base
+    text-white placeholder:text-[#555b67] outline-none transition
+    focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20
+    ${
+      hasError
+        ? 'border-pink-600 focus:border-pink-500 focus:ring-pink-500/20'
+        : 'border-[#1b222d] hover:border-[#343b49]'
+    }`;
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+  return (
+    <main className='relative isolate flex min-h-screen items-center justify-center overflow-hidden bg-black px-4 py-8 sm:px-6'>
+      {/* Purple gradient background */}
+      <div
+        aria-hidden='true'
+        className='pointer-events-none fixed inset-0 -z-10'
+        style={{
+          background: `
+      radial-gradient(
+        ellipse 75% 48% at 0% 100%,
+        rgba(109, 40, 217, 0.95) 0%,
+        rgba(76, 29, 149, 0.65) 40%,
+        transparent 100%
+      ),
+      radial-gradient(
+        ellipse 70% 45% at 100% 100%,
+        rgba(126, 34, 206, 0.8) 0%,
+        rgba(76, 29, 149, 0.5) 45%,
+        transparent 100%
+      ),
+      linear-gradient(
+        to bottom,
+        #000000 0%,
+        #000000 35%,
+        #08020f 58%,
+        #160525 78%,
+        #21063d 100%
+      )
+    `,
+        }}
+      />
+
+      <section className='relative w-full max-w-[456px] rounded-2xl border border-[#1b222d] bg-black/90 p-6 shadow-2xl shadow-purple-950/20 sm:p-8'>
+        {/* Header */}
+        <header className='mb-8 text-center'>
+          <SocialityLogo />
+
+          <h1 className='mt-7 text-2xl font-bold tracking-tight text-white'>
+            Welcome Back!
+          </h1>
+        </header>
+
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          noValidate
+          className='space-y-6'
+        >
+          {/* Email */}
           <div>
             <label
-              htmlFor="email"
-              className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+              htmlFor='email'
+              className='mb-2 block text-sm font-semibold text-white'
             >
               Email
             </label>
+
             <input
-              id="email"
-              type="email"
-              autoComplete="email"
-              {...register("email")}
+              id='email'
+              type='email'
+              autoComplete='email'
+              placeholder='Enter your email'
               aria-invalid={Boolean(errors.email)}
-              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-gray-700 dark:bg-gray-950 dark:text-white"
-              placeholder="nama@email.com"
+              aria-describedby={errors.email ? 'email-error' : undefined}
+              {...register('email')}
+              className={inputClass(Boolean(errors.email))}
             />
+
             {errors.email && (
-              <p className="mt-1 text-sm text-red-600">
+              <p id='email-error' className='mt-2 text-sm text-pink-500'>
                 {errors.email.message}
               </p>
             )}
           </div>
 
+          {/* Password */}
           <div>
             <label
-              htmlFor="password"
-              className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+              htmlFor='password'
+              className='mb-2 block text-sm font-semibold text-white'
             >
               Password
             </label>
-            <input
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              {...register("password")}
-              aria-invalid={Boolean(errors.password)}
-              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-gray-700 dark:bg-gray-950 dark:text-white"
-              placeholder="Masukkan password"
-            />
+
+            <div className='relative'>
+              <input
+                id='password'
+                type={showPassword ? 'text' : 'password'}
+                autoComplete='current-password'
+                placeholder='Enter your password'
+                aria-invalid={Boolean(errors.password)}
+                aria-describedby={
+                  errors.password ? 'password-error' : undefined
+                }
+                {...register('password')}
+                className={`${inputClass(Boolean(errors.password))} pr-12`}
+              />
+
+              <button
+                type='button'
+                onClick={() => setShowPassword((current) => !current)}
+                aria-label={
+                  showPassword ? 'Sembunyikan password' : 'Tampilkan password'
+                }
+                aria-pressed={showPassword}
+                className='absolute inset-y-0 right-0 flex items-center px-4 text-gray-500 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500'
+              >
+                <EyeIcon visible={showPassword} />
+              </button>
+            </div>
+
             {errors.password && (
-              <p className="mt-1 text-sm text-red-600">
+              <p id='password-error' className='mt-2 text-sm text-pink-500'>
                 {errors.password.message}
               </p>
             )}
           </div>
 
+          {/* API authentication error */}
           {loginMutation.isError && (
-            <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
+            <p role='alert' className='text-sm text-pink-500'>
               Login gagal. Periksa email dan password, lalu coba lagi.
             </p>
           )}
@@ -101,27 +224,29 @@ export default function LoginPage() {
           {!loginMutation.isError &&
             loginMutation.isSuccess &&
             !loginMutation.data.success && (
-              <p role="alert" className="text-sm text-red-600">
+              <p role='alert' className='text-sm text-pink-500'>
                 Login gagal. Silakan periksa kembali kredensial Anda.
               </p>
             )}
 
+          {/* Submit */}
           <button
-            type="submit"
+            type='submit'
             disabled={loginMutation.isPending}
-            className="w-full rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+            className='w-full rounded-full bg-violet-600 px-5 py-3.5 font-semibold text-white transition hover:bg-violet-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black disabled:cursor-not-allowed disabled:opacity-60'
           >
-            {loginMutation.isPending ? "Sedang masuk..." : "Login"}
+            {loginMutation.isPending ? 'Sedang masuk...' : 'Login'}
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
-          Belum punya akun?{" "}
+        {/* Register link */}
+        <p className='mt-6 text-center text-sm font-normal text-white sm:text-base'>
+          Don't have an account?{' '}
           <Link
-            href="/register"
-            className="font-semibold text-blue-600 hover:underline dark:text-blue-400"
+            href='/register'
+            className='font-normal text-violet-500 transition hover:text-violet-400'
           >
-            Daftar
+            Register
           </Link>
         </p>
       </section>
