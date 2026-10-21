@@ -80,6 +80,43 @@ function SearchIcon() {
 }
 
 export default function Home() {
+  const [showPostSuccess, setShowPostSuccess] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+
+    if (params.get('postSuccess') !== '1') return;
+
+    setShowPostSuccess(true);
+
+    window.history.replaceState(
+      window.history.state,
+      '',
+      window.location.pathname + window.location.hash
+    );
+  }, []);
+
+  useEffect(() => {
+    function handleClosePostToast() {
+      setShowPostSuccess(false);
+    }
+
+    window.addEventListener('sociality:close-post-toast', handleClosePostToast);
+
+    return () => {
+      window.removeEventListener('sociality:close-post-toast', handleClosePostToast);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!showPostSuccess) return;
+
+    const timeoutId = window.setTimeout(() => {
+      setShowPostSuccess(false);
+    }, 3000);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [showPostSuccess]);
   const user = useAppSelector((state) => state.auth.user);
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
 
@@ -136,7 +173,7 @@ export default function Home() {
 
   return (
     <main className='min-h-screen bg-black pb-28 text-white'>
-      <SocialityNavbar />
+<SocialityNavbar showPostSuccess={showPostSuccess} />
 
       {/* Timeline */}
       <div className='mx-auto w-full max-w-[648px] px-4 pt-5 sm:px-6 sm:pt-8'>

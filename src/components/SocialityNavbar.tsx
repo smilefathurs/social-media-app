@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
@@ -75,7 +75,7 @@ function SearchIcon() {
 }
 
 
-export default function SocialityNavbar() {
+export default function SocialityNavbar({ showPostSuccess = false }: { showPostSuccess?: boolean }) {
   const user = useAppSelector((state) => state.auth.user);
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
   const logoutMutation = useLogoutMutation();
@@ -194,6 +194,52 @@ export default function SocialityNavbar() {
                   </svg>
                 </button>
 
+                {showPostSuccess && (
+                  <div
+                    role='status'
+                    aria-live='polite'
+                    className='absolute right-0 top-full z-[100] mt-2 flex h-10 w-[291px] items-center gap-2 rounded-lg bg-[#079455] px-3 py-2 text-sm font-semibold tracking-[-0.02em] text-white shadow-xl shadow-black/20'
+                  >
+                    <span className='flex size-5 shrink-0 items-center justify-center rounded-full bg-white/15'>
+                      <svg
+                        viewBox='0 0 24 24'
+                        fill='none'
+                        className='size-3.5'
+                        aria-hidden='true'
+                      >
+                        <path
+                          d='m5 12 4 4L19 6'
+                          stroke='currentColor'
+                          strokeWidth='2'
+                          strokeLinecap='round'
+                          strokeLinejoin='round'
+                        />
+                      </svg>
+                    </span>
+                    <span className='flex-1'>Success Post</span>
+                    <button
+                      type='button'
+                      onClick={() => {
+                        const closeEvent = new CustomEvent('sociality:close-post-toast');
+                        window.dispatchEvent(closeEvent);
+                      }}
+                      aria-label='Tutup notifikasi'
+                      className='ml-auto flex size-5 shrink-0 cursor-pointer items-center justify-center rounded-md text-white/90 transition hover:bg-white/15 hover:text-white'
+                    >
+                      <svg
+                        viewBox='0 0 24 24'
+                        fill='none'
+                        stroke='currentColor'
+                        strokeWidth='2'
+                        strokeLinecap='round'
+                        className='size-4'
+                        aria-hidden='true'
+                      >
+                        <path d='M18 6 6 18M6 6l12 12' />
+                      </svg>
+                    </button>
+                  </div>
+                )}
                 {isProfileMenuOpen && (
                   <div
                     role='menu'
@@ -372,5 +418,3 @@ export default function SocialityNavbar() {
     </>
   );
 }
-
-
