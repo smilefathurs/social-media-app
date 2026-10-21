@@ -1,20 +1,20 @@
-﻿"use client";
+﻿'use client';
 
-import { useState } from "react";
-import Image from "next/image";
+import { useState } from 'react';
+import Image from 'next/image';
 import {
   useFollowUserMutation,
   useSearchUsersQuery,
   useUnfollowUserMutation,
-} from "../users.hooks";
+} from '../users.hooks';
 
 export default function UserSearch() {
-  const [searchInput, setSearchInput] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchInput, setSearchInput] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
 
   const usersQuery = useSearchUsersQuery(
     { q: searchTerm, page: 1, limit: 20 },
-    searchTerm.length > 0,
+    searchTerm.length > 0
   );
 
   const followMutation = useFollowUserMutation();
@@ -42,103 +42,188 @@ export default function UserSearch() {
   const mutationError = followMutation.isError || unfollowMutation.isError;
 
   return (
-    <section className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-      <h2 className="mb-3 text-lg font-semibold">Cari Pengguna</h2>
+    <section className='relative w-full min-w-0'>
+      <form
+        onSubmit={handleSearch}
+        role='search'
+        className='flex h-11 w-full items-center gap-3 rounded-full border border-white/10 bg-[#17151d] px-4 transition focus-within:border-purple-500/70 focus-within:ring-2 focus-within:ring-purple-500/10'
+      >
+        <svg
+          aria-hidden='true'
+          viewBox='0 0 24 24'
+          fill='none'
+          className='size-5 shrink-0 text-white/45'
+        >
+          <circle
+            cx='10.8'
+            cy='10.8'
+            r='6.8'
+            stroke='currentColor'
+            strokeWidth='1.8'
+          />
+          <path
+            d='m16 16 4 4'
+            stroke='currentColor'
+            strokeWidth='1.8'
+            strokeLinecap='round'
+          />
+        </svg>
 
-      <form onSubmit={handleSearch} className="flex gap-2">
         <input
-          type="search"
+          type='search'
           value={searchInput}
           onChange={(event) => setSearchInput(event.target.value)}
-          placeholder="Cari nama atau username..."
-          aria-label="Cari nama atau username"
-          className="min-w-0 flex-1 rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm outline-none focus:border-blue-500 dark:border-gray-700"
+          placeholder='Cari pengguna...'
+          aria-label='Cari nama atau username'
+          className='min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-white/40'
         />
+
+        {searchInput && (
+          <button
+            type='button'
+            onClick={() => {
+              setSearchInput('');
+              setSearchTerm('');
+            }}
+            aria-label='Hapus pencarian'
+            className='shrink-0 text-white/45 transition hover:text-white'
+          >
+            <svg
+              viewBox='0 0 24 24'
+              fill='none'
+              className='size-4'
+              aria-hidden='true'
+            >
+              <path
+                d='m6 6 12 12M18 6 6 18'
+                stroke='currentColor'
+                strokeWidth='1.8'
+                strokeLinecap='round'
+              />
+            </svg>
+          </button>
+        )}
+
         <button
-          type="submit"
+          type='submit'
           disabled={!searchInput.trim() || usersQuery.isFetching}
-          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+          aria-label='Cari pengguna'
+          className='shrink-0 text-purple-400 transition hover:text-purple-300 disabled:cursor-not-allowed disabled:opacity-40'
         >
-          Cari
+          {usersQuery.isFetching ? (
+            <span className='block size-4 animate-spin rounded-full border-2 border-purple-400/30 border-t-purple-400' />
+          ) : (
+            <svg
+              viewBox='0 0 24 24'
+              fill='none'
+              className='size-5'
+              aria-hidden='true'
+            >
+              <circle
+                cx='10.8'
+                cy='10.8'
+                r='6.8'
+                stroke='currentColor'
+                strokeWidth='1.8'
+              />
+              <path
+                d='m16 16 4 4'
+                stroke='currentColor'
+                strokeWidth='1.8'
+                strokeLinecap='round'
+              />
+            </svg>
+          )}
         </button>
       </form>
 
-      {usersQuery.isFetching && (
-        <p className="mt-4 text-sm text-gray-500">Mencari pengguna...</p>
-      )}
+      {searchTerm && (
+        <div className='absolute inset-x-0 top-full z-50 mt-3 max-h-[min(65vh,480px)] overflow-y-auto rounded-2xl border border-white/10 bg-[#111016] p-4 shadow-2xl shadow-black/40'>
+          <div className='mb-3 flex items-center justify-between gap-3'>
+            <h2 className='text-sm font-semibold text-white'>
+              Hasil pencarian
+            </h2>
+            {!usersQuery.isFetching && usersQuery.isSuccess && (
+              <span className='text-xs text-white/40'>
+                {users.length} pengguna
+              </span>
+            )}
+          </div>
 
-      {usersQuery.isError && (
-        <p role="alert" className="mt-4 text-sm text-red-600">
-          Gagal mencari pengguna. Silakan coba lagi.
-        </p>
-      )}
+          {usersQuery.isFetching && (
+            <p className='py-4 text-sm text-white/50'>Mencari pengguna...</p>
+          )}
 
-      {mutationError && (
-        <p role="alert" className="mt-4 text-sm text-red-600">
-          Gagal memperbarui status Follow. Silakan coba lagi.
-        </p>
-      )}
-
-      {usersQuery.isSuccess && !usersQuery.isFetching && (
-        <div className="mt-4 space-y-3">
-          {users.length === 0 ? (
-            <p className="text-sm text-gray-500">
-              Tidak ada pengguna yang ditemukan.
+          {usersQuery.isError && (
+            <p role='alert' className='py-3 text-sm text-red-400'>
+              Gagal mencari pengguna. Silakan coba lagi.
             </p>
-          ) : (
-            users.map((user) => (
-              <div
-                key={user.id}
-                className="flex items-center gap-3 border-t border-gray-100 pt-3 first:border-0 first:pt-0 dark:border-gray-800"
-              >
-                {user.avatarUrl ? (
-                  <Image
-                    src={user.avatarUrl}
-                    alt={`Avatar ${user.name || user.username}`}
-                    width={40}
-                    height={40}
-                    unoptimized
-                    className="size-10 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-blue-100 font-semibold text-blue-700 dark:bg-blue-950 dark:text-blue-300">
-                    {(user.name || user.username).charAt(0).toUpperCase()}
-                  </div>
-                )}
+          )}
 
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold">
-                    {user.name || user.username}
-                  </p>
-                  <p className="truncate text-xs text-gray-500 dark:text-gray-400">
-                    @{user.username}
-                  </p>
+          {mutationError && (
+            <p role='alert' className='mb-3 text-sm text-red-400'>
+              Gagal memperbarui status Follow. Silakan coba lagi.
+            </p>
+          )}
+
+          {usersQuery.isSuccess && !usersQuery.isFetching && (
+            <>
+              {users.length === 0 ? (
+                <p className='py-4 text-sm text-white/50'>
+                  Tidak ada pengguna yang ditemukan.
+                </p>
+              ) : (
+                <div className='space-y-3'>
+                  {users.map((user) => (
+                    <div
+                      key={user.id}
+                      className='flex items-center gap-3 border-t border-white/[0.07] pt-3 first:border-0 first:pt-0'
+                    >
+                      {user.avatarUrl ? (
+                        <Image
+                          src={user.avatarUrl}
+                          alt={`Avatar ${user.name || user.username}`}
+                          width={40}
+                          height={40}
+                          unoptimized
+                          className='size-10 shrink-0 rounded-full object-cover'
+                        />
+                      ) : (
+                        <div className='flex size-10 shrink-0 items-center justify-center rounded-full bg-purple-500/15 font-semibold text-purple-300'>
+                          {(user.name || user.username).charAt(0).toUpperCase()}
+                        </div>
+                      )}
+
+                      <div className='min-w-0 flex-1'>
+                        <p className='truncate text-sm font-semibold text-white'>
+                          {user.name || user.username}
+                        </p>
+                        <p className='truncate text-xs text-white/45'>
+                          @{user.username}
+                        </p>
+                      </div>
+
+                      <button
+                        type='button'
+                        onClick={() =>
+                          handleFollowToggle(user.username, user.isFollowedByMe)
+                        }
+                        disabled={isFollowPending}
+                        className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${
+                          user.isFollowedByMe
+                            ? 'border border-white/15 text-white/70 hover:bg-white/10'
+                            : 'bg-purple-600 text-white hover:bg-purple-500'
+                        }`}
+                      >
+                        {user.isFollowedByMe ? 'Following' : 'Follow'}
+                      </button>
+                    </div>
+                  ))}
                 </div>
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    handleFollowToggle(user.username, user.isFollowedByMe)
-                  }
-                  disabled={isFollowPending}
-                  className={`shrink-0 rounded-lg px-3 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
-                    user.isFollowedByMe
-                      ? "border border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
-                      : "bg-blue-600 text-white hover:bg-blue-700"
-                  }`}
-                >
-                  {user.isFollowedByMe ? "Following" : "Follow"}
-                </button>
-              </div>
-            ))
+              )}
+            </>
           )}
         </div>
-      )}
-
-      {!searchTerm && (
-        <p className="mt-4 text-sm text-gray-500">
-          Masukkan nama atau username untuk mulai mencari.
-        </p>
       )}
     </section>
   );

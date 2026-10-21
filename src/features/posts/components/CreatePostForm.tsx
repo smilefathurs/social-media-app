@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { useCreatePostMutation } from '../posts.hooks';
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
@@ -12,11 +13,13 @@ export default function CreatePostForm() {
   const [image, setImage] = useState<File | null>(null);
   const [caption, setCaption] = useState('');
   const [validationError, setValidationError] = useState('');
+  const router = useRouter();
 
   const createPostMutation = useCreatePostMutation();
 
   const [previewUrl, setPreviewUrl] = useState('');
   const previewUrlRef = useRef<string | null>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     return () => {
@@ -35,6 +38,18 @@ export default function CreatePostForm() {
 
     setPreviewUrl(previewUrlRef.current ?? '');
   }
+
+  function resetForm() {
+    setImage(null);
+    setCaption('');
+    setValidationError('');
+    updatePreview(null);
+    createPostMutation.reset();
+  }
+
+  useEffect(() => {
+    resetForm();
+  }, []);
 
   function handleImageChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -84,6 +99,13 @@ export default function CreatePostForm() {
           setImage(null);
           setCaption('');
           setValidationError('');
+          updatePreview(null);
+
+          if (imageInputRef.current) {
+            imageInputRef.current.value = '';
+          }
+
+          router.push('/');
         },
       }
     );
@@ -107,6 +129,7 @@ export default function CreatePostForm() {
         </label>
 
         <input
+          ref={imageInputRef}
           id='post-image'
           type='file'
           accept='image/jpeg,image/png,image/webp'
