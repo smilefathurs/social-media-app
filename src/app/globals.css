@@ -50,7 +50,7 @@
 
 :root {
   --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  --foreground: #fdfdfd;
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
@@ -141,4 +141,260 @@ input:-webkit-autofill:focus {
   -webkit-box-shadow: 0 0 0 1000px #0b0e13 inset;
   transition: background-color 9999s ease-in-out 0s;
   caret-color: #ffffff;
+}
+
+/* ========================================
+   SOCIALITY METEORS
+======================================== */
+
+.meteor-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.meteor {
+  position: absolute;
+  width: var(--meteor-width, 100px);
+  height: var(--meteor-height, 2px);
+  border-radius: 999px;
+
+  /* Bright head at the right end before rotation */
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgb(139 92 246 / 10%) 20%,
+    rgb(167 139 250 / 40%) 55%,
+    rgb(221 214 254 / 85%) 82%,
+    #fdfdfd 100%
+  );
+
+  box-shadow: 0 0 8px rgb(167 139 250 / 35%);
+  opacity: 0;
+  transform: rotate(145deg);
+  transform-origin: center;
+
+  animation: sociality-meteor var(--meteor-duration, 7s) linear infinite;
+
+  animation-delay: var(--meteor-delay, 0s);
+}
+
+/* 25 meteor positions and variations */
+.meteor-1 {
+  top: 3%;
+  left: 12%;
+  --meteor-width: 80px;
+  --meteor-duration: 6s;
+  --meteor-delay: 0s;
+}
+.meteor-2 {
+  top: 7%;
+  left: 56%;
+  --meteor-width: 125px;
+  --meteor-duration: 8s;
+  --meteor-delay: 1.7s;
+}
+.meteor-3 {
+  top: 11%;
+  left: 83%;
+  --meteor-width: 65px;
+  --meteor-duration: 5s;
+  --meteor-delay: 3.1s;
+}
+.meteor-4 {
+  top: 15%;
+  left: 32%;
+  --meteor-width: 145px;
+  --meteor-duration: 9s;
+  --meteor-delay: 0.9s;
+}
+.meteor-5 {
+  top: 19%;
+  left: 68%;
+  --meteor-width: 95px;
+  --meteor-duration: 7s;
+  --meteor-delay: 4.5s;
+}
+
+.meteor-6 {
+  top: 23%;
+  left: 8%;
+  --meteor-width: 75px;
+  --meteor-duration: 5.5s;
+  --meteor-delay: 2.3s;
+}
+.meteor-7 {
+  top: 27%;
+  left: 45%;
+  --meteor-width: 115px;
+  --meteor-duration: 8.5s;
+  --meteor-delay: 5.8s;
+}
+.meteor-8 {
+  top: 31%;
+  left: 91%;
+  --meteor-width: 55px;
+  --meteor-height: 1px;
+  --meteor-duration: 6.5s;
+  --meteor-delay: 3.8s;
+}
+.meteor-9 {
+  top: 35%;
+  left: 24%;
+  --meteor-width: 135px;
+  --meteor-duration: 7.5s;
+  --meteor-delay: 6.4s;
+}
+.meteor-10 {
+  top: 39%;
+  left: 73%;
+  --meteor-width: 90px;
+  --meteor-duration: 5.8s;
+  --meteor-delay: 1.2s;
+}
+
+.meteor-11 {
+  top: 43%;
+  left: 14%;
+  --meteor-width: 110px;
+  --meteor-duration: 7.2s;
+  --meteor-delay: 2.8s;
+}
+.meteor-12 {
+  top: 47%;
+  left: 51%;
+  --meteor-width: 70px;
+  --meteor-height: 1px;
+  --meteor-duration: 5.2s;
+  --meteor-delay: 5.1s;
+}
+.meteor-13 {
+  top: 51%;
+  left: 87%;
+  --meteor-width: 130px;
+  --meteor-duration: 8.2s;
+  --meteor-delay: 0.5s;
+}
+.meteor-14 {
+  top: 55%;
+  left: 37%;
+  --meteor-width: 85px;
+  --meteor-duration: 6.3s;
+  --meteor-delay: 4.1s;
+}
+.meteor-15 {
+  top: 59%;
+  left: 63%;
+  --meteor-width: 150px;
+  --meteor-duration: 9.2s;
+  --meteor-delay: 6.8s;
+}
+
+.meteor-16 {
+  top: 63%;
+  left: 5%;
+  --meteor-width: 95px;
+  --meteor-duration: 7.8s;
+  --meteor-delay: 1.9s;
+}
+.meteor-17 {
+  top: 67%;
+  left: 42%;
+  --meteor-width: 60px;
+  --meteor-height: 1px;
+  --meteor-duration: 5.7s;
+  --meteor-delay: 3.4s;
+}
+.meteor-18 {
+  top: 71%;
+  left: 78%;
+  --meteor-width: 120px;
+  --meteor-duration: 8.8s;
+  --meteor-delay: 5.5s;
+}
+.meteor-19 {
+  top: 75%;
+  left: 19%;
+  --meteor-width: 75px;
+  --meteor-duration: 6.8s;
+  --meteor-delay: 0.7s;
+}
+.meteor-20 {
+  top: 79%;
+  left: 57%;
+  --meteor-width: 140px;
+  --meteor-duration: 9.5s;
+  --meteor-delay: 4.8s;
+}
+
+.meteor-21 {
+  top: 83%;
+  left: 90%;
+  --meteor-width: 85px;
+  --meteor-duration: 6.1s;
+  --meteor-delay: 2.1s;
+}
+.meteor-22 {
+  top: 87%;
+  left: 34%;
+  --meteor-width: 105px;
+  --meteor-duration: 7.6s;
+  --meteor-delay: 5.9s;
+}
+.meteor-23 {
+  top: 91%;
+  left: 69%;
+  --meteor-width: 65px;
+  --meteor-duration: 5.4s;
+  --meteor-delay: 3.6s;
+}
+.meteor-24 {
+  top: 95%;
+  left: 10%;
+  --meteor-width: 125px;
+  --meteor-duration: 8.1s;
+  --meteor-delay: 1.4s;
+}
+.meteor-25 {
+  top: 97%;
+  left: 48%;
+  --meteor-width: 90px;
+  --meteor-duration: 6.6s;
+  --meteor-delay: 7.1s;
+}
+
+/* Travel diagonally toward the lower-left */
+@keyframes sociality-meteor {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) rotate(145deg);
+  }
+
+  4% {
+    opacity: 0.9;
+  }
+
+  15% {
+    opacity: 0.65;
+  }
+
+  45% {
+    opacity: 0;
+    transform: translate(-45vw, 35vh) rotate(145deg);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-45vw, 35vh) rotate(145deg);
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .meteor {
+    animation: none;
+    display: none;
+  }
 }

@@ -1,5 +1,6 @@
 ﻿'use client';
 
+import Image from 'next/image';
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -11,28 +12,16 @@ import { useLoginMutation } from '@/features/auth/auth.hooks';
 function SocialityLogo() {
   return (
     <div className='flex items-center justify-center gap-3'>
-      <svg
-        viewBox='0 0 40 40'
-        className='h-9 w-9 shrink-0 text-white'
-        fill='none'
-        aria-hidden='true'
-      >
-        {Array.from({ length: 16 }, (_, i) => (
-          <line
-            key={i}
-            x1='20'
-            y1='3'
-            x2='20'
-            y2='13'
-            stroke='currentColor'
-            strokeWidth='2.5'
-            strokeLinecap='round'
-            transform={`rotate(${i * 22.5} 20 20)`}
-          />
-        ))}
-      </svg>
+      <Image
+        src='/images/sociality-logo.png'
+        alt='Sociality Logo'
+        width={40}
+        height={40}
+        priority
+        className='h-10 w-10 object-contain'
+      />
 
-      <span className='text-2xl font-bold tracking-tight text-white'>
+      <span className='text-2xl font-bold tracking-tight text-[#FDFDFD]'>
         Sociality
       </span>
     </div>
@@ -129,7 +118,14 @@ export default function LoginPage() {
         }}
       />
 
-      <section className='relative w-full max-w-[456px] rounded-2xl border border-[#1b222d] bg-black/90 p-6 shadow-2xl shadow-purple-950/20 sm:p-8'>
+      {/* Subtle meteor shower */}
+      <div className='meteor-layer' aria-hidden='true'>
+        {Array.from({ length: 25 }, (_, i) => (
+          <span key={i} className={`meteor meteor-${i + 1}`} />
+        ))}
+      </div>
+
+      <section className='relative z-10 w-full max-w-[456px] rounded-2xl border border-white/[0.06] bg-black/60 p-6 shadow-2xl shadow-purple-950/10 backdrop-blur-sm sm:p-8'>
         {/* Header */}
         <header className='mb-8 text-center'>
           <SocialityLogo />
