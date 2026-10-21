@@ -1,10 +1,16 @@
-﻿"use client";
+﻿'use client';
 
-import { useMutation } from "@tanstack/react-query";
-import { loginUser } from "./auth.service";
-import { saveAuthSession } from "./auth-storage";
-import { setCredentials } from "./auth.slice";
-import { useAppDispatch } from "@/lib/redux/hooks";
+import { useMutation } from '@tanstack/react-query';
+import { loginUser, registerUser } from './auth.service';
+import { saveAuthSession } from './auth-storage';
+import { setCredentials } from './auth.slice';
+import { useAppDispatch } from '@/lib/redux/hooks';
+
+export function useRegisterMutation() {
+  return useMutation({
+    mutationFn: registerUser,
+  });
+}
 
 export function useLoginMutation() {
   const dispatch = useAppDispatch();
