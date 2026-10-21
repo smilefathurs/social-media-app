@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import Image from 'next/image';
@@ -75,7 +75,7 @@ export default function UserSearch() {
           onChange={(event) => setSearchInput(event.target.value)}
           placeholder='Cari pengguna...'
           aria-label='Cari nama atau username'
-          className='min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-white/40'
+          className='min-w-0 flex-1 appearance-none bg-transparent text-sm text-white outline-none placeholder:text-white/40 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden'
         />
 
         {searchInput && (
@@ -86,7 +86,7 @@ export default function UserSearch() {
               setSearchTerm('');
             }}
             aria-label='Hapus pencarian'
-            className='shrink-0 text-white/45 transition hover:text-white'
+            className='shrink-0 cursor-pointer text-white/45 transition hover:text-white'
           >
             <svg
               viewBox='0 0 24 24'
@@ -104,37 +104,6 @@ export default function UserSearch() {
           </button>
         )}
 
-        <button
-          type='submit'
-          disabled={!searchInput.trim() || usersQuery.isFetching}
-          aria-label='Cari pengguna'
-          className='shrink-0 text-purple-400 transition hover:text-purple-300 disabled:cursor-not-allowed disabled:opacity-40'
-        >
-          {usersQuery.isFetching ? (
-            <span className='block size-4 animate-spin rounded-full border-2 border-purple-400/30 border-t-purple-400' />
-          ) : (
-            <svg
-              viewBox='0 0 24 24'
-              fill='none'
-              className='size-5'
-              aria-hidden='true'
-            >
-              <circle
-                cx='10.8'
-                cy='10.8'
-                r='6.8'
-                stroke='currentColor'
-                strokeWidth='1.8'
-              />
-              <path
-                d='m16 16 4 4'
-                stroke='currentColor'
-                strokeWidth='1.8'
-                strokeLinecap='round'
-              />
-            </svg>
-          )}
-        </button>
       </form>
 
       {searchTerm && (

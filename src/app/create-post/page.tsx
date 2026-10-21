@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { useAppSelector } from '@/lib/redux/hooks';
 import CreatePostForm from '@/features/posts/components/CreatePostForm';
+import SocialityNavbar from '@/components/SocialityNavbar';
 
 function ArrowLeftIcon() {
   return (
@@ -27,9 +27,7 @@ function ArrowLeftIcon() {
 
 export default function CreatePostPage() {
   const router = useRouter();
-  const user = useAppSelector((state) => state.auth.user);
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
-  const [formKey, setFormKey] = useState(0);
 
   if (!isAuthenticated) {
     return (
@@ -52,36 +50,7 @@ export default function CreatePostPage() {
 
   return (
     <main className='min-h-screen bg-black px-4 pb-12 text-white'>
-      <header className='sticky top-0 z-40 border-b border-white/[0.08] bg-black/90 backdrop-blur-xl'>
-        <div className='mx-auto flex h-[72px] max-w-6xl items-center justify-between gap-4'>
-          <Link
-            href='/'
-            className='flex shrink-0 items-center gap-2.5'
-            aria-label='Kembali ke Timeline Sociality'
-          >
-            <Image
-              src='/images/sociality-logo.png'
-              alt=''
-              width={44}
-              height={44}
-              priority
-              className='size-10 shrink-0 object-contain'
-            />
-            <span className='text-xl font-bold tracking-tight'>Sociality</span>
-          </Link>
-
-          <Link
-            href={
-              user?.username
-                ? `/users/${encodeURIComponent(user.username)}`
-                : '/'
-            }
-            className='rounded-full border border-white/10 px-4 py-2 text-sm text-white/70 transition hover:border-purple-400/40 hover:text-white'
-          >
-            Profil
-          </Link>
-        </div>
-      </header>
+      <SocialityNavbar />
 
       <div className='mx-auto w-full max-w-[600px] pt-8 sm:pt-12'>
         <button
@@ -105,8 +74,8 @@ export default function CreatePostPage() {
           </p>
         </div>
 
-        <div className='rounded-2xl border border-white/10 bg-[#111016] p-4 sm:p-6'>
-          <CreatePostForm key={formKey} />
+        <div className='w-full'>
+          <CreatePostForm />
         </div>
       </div>
     </main>
