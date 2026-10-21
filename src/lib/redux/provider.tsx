@@ -4,7 +4,6 @@ import { useEffect, useState, useSyncExternalStore } from 'react';
 import { Provider } from 'react-redux';
 import type { AppStore } from './store';
 import { makeStore } from './store';
-import { setAuthTokenGetter } from '@/lib/api';
 import { loadAuthSession } from '@/features/auth/auth-storage';
 import { restoreSession } from '@/features/auth/auth.slice';
 
@@ -50,8 +49,6 @@ export default function ReduxProvider({
   );
 
   useEffect(() => {
-    setAuthTokenGetter(() => store.getState().auth.token);
-
     const session = loadAuthSession();
 
     if (session) {

@@ -6,10 +6,12 @@ import { useFeedQuery } from '@/features/posts/posts.hooks';
 import PostCard from '@/features/posts/components/PostCard';
 import UserSearch from '@/features/users/components/UserSearch';
 import CreatePostForm from '@/features/posts/components/CreatePostForm';
+import { useLogoutMutation } from '@/features/auth/auth-logout.hooks';
 
 export default function Home() {
   const user = useAppSelector((state) => state.auth.user);
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
+  const logoutMutation = useLogoutMutation();
 
   const feedQuery = useFeedQuery({ page: 1, limit: 20 }, isAuthenticated);
 
@@ -48,6 +50,16 @@ export default function Home() {
                 Login
               </Link>
             )}
+            {isAuthenticated && (
+              <button
+                type='button'
+                onClick={() => logoutMutation.mutate()}
+                disabled={logoutMutation.isPending}
+                className='rounded-lg border border-gray-300 px-4 py-2 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-700 dark:hover:bg-gray-800'
+              >
+                {logoutMutation.isPending ? 'Logging out...' : 'Logout'}
+              </button>
+            )}
           </nav>
         </div>
       </header>
@@ -68,7 +80,21 @@ export default function Home() {
             >
               Saved Posts
             </Link>
-            <div className='rounded-lg px-3 py-2 text-gray-500'>Profile</div>
+            {isAuthenticated && user?.username ? (
+              <Link
+                href={`/users/${encodeURIComponent(user.username)}`}
+                className='block rounded-lg px-3 py-2 text-gray-600 transition-colors hover:bg-blue-50 hover:text-blue-700 dark:text-gray-300 dark:hover:bg-blue-950 dark:hover:text-blue-300'
+              >
+                Profile
+              </Link>
+            ) : (
+              <Link
+                href='/login'
+                className='block rounded-lg px-3 py-2 text-gray-600 transition-colors hover:bg-blue-50 hover:text-blue-700 dark:text-gray-300 dark:hover:bg-blue-950 dark:hover:text-blue-300'
+              >
+                Profile
+              </Link>
+            )}
           </div>
         </aside>
 
