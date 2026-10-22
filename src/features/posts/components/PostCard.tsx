@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
@@ -30,54 +30,42 @@ function Icon({
   filled?: boolean;
   className?: string;
 }) {
-  const common = {
-    className,
-    viewBox: '0 0 24 24',
-    fill: filled ? 'currentColor' : 'none',
-    stroke: 'currentColor',
-    strokeWidth: 1.8,
-    strokeLinecap: 'round' as const,
-    strokeLinejoin: 'round' as const,
-    'aria-hidden': true as const,
-  };
-
-  switch (name) {
-    case 'heart':
-      return (
-        <svg {...common}>
-          <path d='M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z' />
-        </svg>
-      );
-    case 'message':
-      return (
-        <svg {...common}>
-          <path d='M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z' />
-        </svg>
-      );
-    case 'bookmark':
-      return (
-        <svg {...common}>
-          <path d='M6 4.8A1.8 1.8 0 0 1 7.8 3h8.4A1.8 1.8 0 0 1 18 4.8V21l-6-4-6 4V4.8Z' />
-        </svg>
-      );
-    case 'share':
-      return (
-        <svg {...common}>
-          <circle cx='18' cy='5' r='3' />
-          <circle cx='6' cy='12' r='3' />
-          <circle cx='18' cy='19' r='3' />
-          <path d='m8.7 10.7 6.6-4.4M8.7 13.3l6.6 4.4' />
-        </svg>
-      );
-    case 'more':
-      return (
-        <svg {...common}>
-          <circle cx='5' cy='12' r='1' fill='currentColor' />
-          <circle cx='12' cy='12' r='1' fill='currentColor' />
-          <circle cx='19' cy='12' r='1' fill='currentColor' />
-        </svg>
-      );
+  if (name === 'more') {
+    return (
+      <svg
+        className={className}
+        viewBox='0 0 24 24'
+        fill='currentColor'
+        aria-hidden='true'
+      >
+        <circle cx='5' cy='12' r='1' />
+        <circle cx='12' cy='12' r='1' />
+        <circle cx='19' cy='12' r='1' />
+      </svg>
+    );
   }
+
+  const iconSrc =
+    name === 'heart'
+      ? filled
+        ? '/icons/like-active.svg'
+        : '/icons/like-normal.svg'
+      : name === 'message'
+        ? '/icons/comment.svg'
+        : name === 'share'
+          ? '/icons/share.svg'
+          : filled
+            ? '/icons/save-active.svg'
+            : '/icons/save-normal.svg';
+
+  return (
+    <img
+      src={iconSrc}
+      alt=''
+      aria-hidden='true'
+      className={`${className} shrink-0 object-contain`}
+    />
+  );
 }
 
 function formatPostDate(value: string): string {
@@ -87,12 +75,83 @@ function formatPostDate(value: string): string {
     return value;
   }
 
-  return new Intl.DateTimeFormat('id-ID', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
+  const diffMs = Math.max(0, Date.now() - date.getTime());
+  const diffMinutes = Math.floor(diffMs / (1000 * 60));
+  const diffHours = Math.floor(diffMinutes / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffMinutes < 1) return 'Just now';
+
+  if (diffMinutes < 60) {
+    return `${diffMinutes} ${diffMinutes === 1 ? 'Minute' : 'Minutes'} Ago`;
+  }
+
+  if (diffHours < 24) {
+    return `${diffHours} ${diffHours === 1 ? 'Hour' : 'Hours'} Ago`;
+  }
+
+  if (diffDays < 7) {
+    return `${diffDays} ${diffDays === 1 ? 'Day' : 'Days'} Ago`;
+  }
+
+  return new Intl.DateTimeFormat('en-US', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
   }).format(date);
 }
 
+function CaptionText({
+  username,
+  caption,
+}: {
+  username: string;
+  caption: string;
+}) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isTruncated, setIsTruncated] = useState(false);
+  const [isMeasured, setIsMeasured] = useState(false);
+
+  const captionRef = React.useRef<HTMLParagraphElement>(null);
+
+  useEffect(() => {
+    const element = captionRef.current;
+    if (!element) return;
+
+    setIsTruncated(element.scrollHeight > element.clientHeight + 1);
+    setIsMeasured(true);
+  }, [caption, username]);
+
+  return (
+    <div className='mx-auto w-full max-w-[600px] px-4 pt-4 sm:px-0'>
+      <p
+        ref={captionRef}
+        className={`break-words text-sm leading-6 text-white/85 ${
+          isExpanded ? 'whitespace-pre-wrap' : 'line-clamp-2'
+        }`}
+      >
+        <Link
+          href={`/users/${encodeURIComponent(username)}`}
+          className='mr-2 font-semibold text-white hover:text-purple-300'
+        >
+          {username}
+        </Link>
+        {caption}
+      </p>
+
+      {isMeasured && isTruncated && (
+        <button
+          type='button'
+          onClick={() => setIsExpanded((previous) => !previous)}
+          className='mt-1 cursor-pointer text-sm font-medium text-purple-400 hover:text-purple-300'
+          aria-expanded={isExpanded}
+        >
+          {isExpanded ? 'Show Less' : 'Show More'}
+        </button>
+      )}
+    </div>
+  );
+}
 export default function PostCard({ post }: PostCardProps) {
   const authorName = post.author.name || post.author.username;
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
@@ -167,12 +226,9 @@ export default function PostCard({ post }: PostCardProps) {
   }
 
   return (
-    <article
-      id={`post-${post.id}`}
-      className='overflow-hidden rounded-2xl border border-white/10 bg-[#111014] text-white shadow-[0_8px_32px_rgba(0,0,0,0.2)]'
-    >
+    <article id={`post-${post.id}`} className='text-white'>
       {/* Header penulis */}
-      <div className='flex items-center gap-3 px-4 py-4 sm:px-5'>
+      <div className='mx-auto flex w-full max-w-[600px] items-center gap-3 px-4 py-4 sm:px-0'>
         <Link
           href={`/users/${encodeURIComponent(post.author.username)}`}
           className='shrink-0 rounded-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-purple-500'
@@ -235,28 +291,18 @@ export default function PostCard({ post }: PostCardProps) {
             width={1200}
             height={1200}
             unoptimized
-            className='h-auto max-h-[600px] w-full object-contain'
+            className='h-[600px] w-full max-w-[600px] rounded-md object-cover'
           />
         </div>
       )}
 
-      {/* Caption berada di bawah gambar */}
+      {/* Caption: dua baris dengan opsi Show More */}
       {post.caption && (
-        <div className='px-4 pt-4 sm:px-5'>
-          <p className='whitespace-pre-wrap break-words text-sm leading-6 text-white/85'>
-            <Link
-              href={`/users/${encodeURIComponent(post.author.username)}`}
-              className='mr-2 font-semibold text-white hover:text-purple-300'
-            >
-              {post.author.username}
-            </Link>
-            {post.caption}
-          </p>
-        </div>
+        <CaptionText username={post.author.username} caption={post.caption} />
       )}
 
       {/* Aksi postingan */}
-      <div className='flex items-center gap-5 px-4 pb-4 pt-4 sm:gap-6 sm:px-5'>
+      <div className='mx-auto flex w-full max-w-[600px] items-center gap-5 px-4 pb-4 pt-4 sm:gap-6 sm:px-0'>
         <button
           type='button'
           onClick={handleLikeToggle}
@@ -270,7 +316,7 @@ export default function PostCard({ post }: PostCardProps) {
                 : 'Sukai postingan'
               : 'Login untuk menyukai postingan'
           }
-          className={`inline-flex items-center gap-2 rounded-lg text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+          className={`cursor-pointer inline-flex items-center gap-2 rounded-lg text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
             post.likedByMe
               ? 'text-purple-400'
               : 'text-white/60 hover:text-purple-300'
@@ -285,7 +331,7 @@ export default function PostCard({ post }: PostCardProps) {
           onClick={() => setIsCommentsOpen((previous) => !previous)}
           aria-expanded={isCommentsOpen}
           aria-controls={`post-comments-${post.id}`}
-          className={`inline-flex items-center gap-2 rounded-lg text-sm transition-colors ${
+          className={`cursor-pointer inline-flex items-center gap-2 rounded-lg text-sm transition-colors ${
             isCommentsOpen
               ? 'text-purple-300'
               : 'text-white/60 hover:text-purple-300'
@@ -296,10 +342,11 @@ export default function PostCard({ post }: PostCardProps) {
           <span>{post.commentCount}</span>
         </button>
 
+        {/* Share Icon */}
         <button
           type='button'
           onClick={handleShare}
-          className='inline-flex items-center rounded-lg text-white/60 transition-colors hover:text-purple-300'
+          className='inline-flex cursor-pointer items-center rounded-lg text-white transition-colors hover:text-purple-300'
           aria-label='Salin tautan postingan'
           title='Salin tautan postingan'
         >
@@ -319,7 +366,7 @@ export default function PostCard({ post }: PostCardProps) {
                 : 'Simpan postingan'
               : 'Login untuk menyimpan postingan'
           }
-          className={`ml-auto inline-flex items-center rounded-lg transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+          className={`ml-auto inline-flex cursor-pointer items-center rounded-lg transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
             isSaved ? 'text-purple-400' : 'text-white/60 hover:text-purple-300'
           }`}
         >
@@ -328,7 +375,10 @@ export default function PostCard({ post }: PostCardProps) {
       </div>
 
       {shareMessage && (
-        <p role='status' className='px-4 pb-3 text-xs text-purple-300 sm:px-5'>
+        <p
+          role='status'
+          className='mx-auto w-full max-w-[600px] px-4 pb-3 text-xs text-purple-300 sm:px-0'
+        >
           {shareMessage}
         </p>
       )}
