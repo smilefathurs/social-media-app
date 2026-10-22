@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
@@ -13,6 +13,7 @@ import {
   getSavedPosts,
   savePost,
   unsavePost,
+  getLikedPosts,
   type FeedParams,
 } from './posts.service';
 import type { CommentsParams } from './posts.types';
@@ -30,8 +31,11 @@ export function useLikeMutation() {
 
   return useMutation({
     mutationFn: (postId: number) => likePost(postId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['feed'] });
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['feed'] }),
+        queryClient.invalidateQueries({ queryKey: ['liked-posts'] }),
+      ]);
     },
   });
 }
@@ -41,8 +45,11 @@ export function useUnlikeMutation() {
 
   return useMutation({
     mutationFn: (postId: number) => unlikePost(postId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['feed'] });
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['feed'] }),
+        queryClient.invalidateQueries({ queryKey: ['liked-posts'] }),
+      ]);
     },
   });
 }
@@ -153,5 +160,13 @@ export function useUnsavePostMutation() {
         queryClient.invalidateQueries({ queryKey: ['feed'] }),
       ]);
     },
+  });
+}
+
+export function useLikedPostsQuery(params: FeedParams = {}, enabled = true) {
+  return useQuery({
+    queryKey: ['liked-posts', params.page ?? 1, params.limit ?? 20],
+    queryFn: () => getLikedPosts(params),
+    enabled,
   });
 }

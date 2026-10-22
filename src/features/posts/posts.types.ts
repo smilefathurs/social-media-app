@@ -82,3 +82,22 @@ export interface SavedPostsResponse {
     };
   };
 }
+
+export interface LikedPostsParams {
+  page?: number;
+  limit?: number;
+}
+
+export interface LikedPostsResponse {
+  success: boolean;
+  message: string;
+  data: {
+    posts: Post[];
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+    };
+  };
+}

@@ -3,6 +3,8 @@ import type {
   FeedResponse,
   SavedPostsParams,
   SavedPostsResponse,
+  LikedPostsParams,
+  LikedPostsResponse,
 } from './posts.types';
 
 export interface FeedParams {
@@ -93,6 +95,19 @@ export async function getSavedPosts(
   params: SavedPostsParams = {}
 ): Promise<SavedPostsResponse> {
   const response = await api.get<SavedPostsResponse>('/api/me/saved', {
+    params: {
+      page: params.page ?? 1,
+      limit: params.limit ?? 20,
+    },
+  });
+
+  return response.data;
+}
+
+export async function getLikedPosts(
+  params: LikedPostsParams = {}
+): Promise<LikedPostsResponse> {
+  const response = await api.get<LikedPostsResponse>('/api/me/likes', {
     params: {
       page: params.page ?? 1,
       limit: params.limit ?? 20,

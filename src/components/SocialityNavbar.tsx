@@ -57,6 +57,40 @@ function UserIcon() {
   );
 }
 
+function BookmarkIcon() {
+  return (
+    <svg
+      viewBox='0 0 24 24'
+      fill='none'
+      stroke='currentColor'
+      strokeWidth='1.8'
+      strokeLinecap='round'
+      strokeLinejoin='round'
+      className='size-5'
+      aria-hidden='true'
+    >
+      <path d='M6 4.8A1.8 1.8 0 0 1 7.8 3h8.4A1.8 1.8 0 0 1 18 4.8V21l-6-4-6 4V4.8Z' />
+    </svg>
+  );
+}
+
+function HeartIcon() {
+  return (
+    <svg
+      viewBox='0 0 24 24'
+      fill='none'
+      stroke='currentColor'
+      strokeWidth='1.8'
+      strokeLinecap='round'
+      strokeLinejoin='round'
+      className='size-5'
+      aria-hidden='true'
+    >
+      <path d='M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z' />
+    </svg>
+  );
+}
+
 function SearchIcon() {
   return (
     <svg
@@ -74,8 +108,11 @@ function SearchIcon() {
   );
 }
 
-
-export default function SocialityNavbar({ showPostSuccess = false }: { showPostSuccess?: boolean }) {
+export default function SocialityNavbar({
+  showPostSuccess = false,
+}: {
+  showPostSuccess?: boolean;
+}) {
   const user = useAppSelector((state) => state.auth.user);
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
   const logoutMutation = useLogoutMutation();
@@ -220,7 +257,9 @@ export default function SocialityNavbar({ showPostSuccess = false }: { showPostS
                     <button
                       type='button'
                       onClick={() => {
-                        const closeEvent = new CustomEvent('sociality:close-post-toast');
+                        const closeEvent = new CustomEvent(
+                          'sociality:close-post-toast'
+                        );
                         window.dispatchEvent(closeEvent);
                       }}
                       aria-label='Tutup notifikasi'
@@ -262,6 +301,26 @@ export default function SocialityNavbar({ showPostSuccess = false }: { showPostS
                     >
                       <UserIcon />
                       Profile
+                    </Link>
+
+                    <Link
+                      href='/saved'
+                      role='menuitem'
+                      onClick={() => setIsProfileMenuOpen(false)}
+                      className='flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-white/75 transition hover:bg-purple-500/10 hover:text-purple-300'
+                    >
+                      <BookmarkIcon />
+                      Saved Posts
+                    </Link>
+
+                    <Link
+                      href='/liked'
+                      role='menuitem'
+                      onClick={() => setIsProfileMenuOpen(false)}
+                      className='flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-white/75 transition hover:bg-purple-500/10 hover:text-purple-300'
+                    >
+                      <HeartIcon />
+                      Liked Posts
                     </Link>
 
                     <Link
