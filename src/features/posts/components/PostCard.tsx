@@ -156,6 +156,17 @@ export default function PostCard({ post }: PostCardProps) {
   const authorName = post.author.name || post.author.username;
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const [shareMessage, setShareMessage] = useState('');
+  const [imageFailed, setImageFailed] = useState(false);
+
+  function handleImageLoad(
+    event: React.SyntheticEvent<HTMLImageElement>
+  ) {
+    const image = event.currentTarget;
+
+    if (image.naturalWidth <= 1 || image.naturalHeight <= 1) {
+      setImageFailed(true);
+    }
+  }
 
   const user = useAppSelector((state) => state.auth.user);
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
@@ -283,15 +294,17 @@ export default function PostCard({ post }: PostCardProps) {
       </div>
 
       {/* Gambar postingan */}
-      {post.imageUrl && (
-        <div className='relative flex max-h-[600px] justify-center overflow-hidden bg-black'>
+      {post.imageUrl && !imageFailed && (
+        <div className='relative mx-auto aspect-square w-full max-w-[600px] overflow-hidden bg-black'>
           <Image
             src={post.imageUrl}
             alt={`Postingan oleh ${authorName}`}
-            width={1200}
-            height={1200}
+            fill
             unoptimized
-            className='h-[600px] w-full max-w-[600px] rounded-md object-cover'
+            onLoad={handleImageLoad}
+            onError={() => setImageFailed(true)}
+            className='rounded-md object-cover'
+            sizes='(max-width: 600px) 100vw, 600px'
           />
         </div>
       )}

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
@@ -20,7 +20,7 @@ export function useLogoutMutation() {
       dispatch(clearCredentials());
       queryClient.clear();
 
-      router.replace('/login');
+      router.replace('/');
       router.refresh();
     },
   });

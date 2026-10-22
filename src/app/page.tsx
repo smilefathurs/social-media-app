@@ -3,13 +3,14 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useInfiniteFeedQuery, useGuestFeedQuery } from '@/features/posts/posts.hooks';
 import { useAppSelector } from '@/lib/redux/hooks';
-import { useFeedQuery } from '@/features/posts/posts.hooks';
 import PostCard from '@/features/posts/components/PostCard';
 import UserSearch from '@/features/users/components/UserSearch';
 import { useLogoutMutation } from '@/features/auth/auth-logout.hooks';
 import { useRouter } from 'next/navigation';
 import SocialityNavbar from '@/components/SocialityNavbar';
+import { loadLastLoggedInUsername } from '@/features/auth/auth-storage';
 
 function HomeIcon({ active = false }: { active?: boolean }) {
   return (
@@ -81,6 +82,11 @@ function SearchIcon() {
 
 export default function Home() {
   const [showPostSuccess, setShowPostSuccess] = useState(false);
+  const [lastLoggedInUsername, setLastLoggedInUsername] = useState<string | null>(null);
+
+  useEffect(() => {
+    setLastLoggedInUsername(loadLastLoggedInUsername());
+  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -104,7 +110,10 @@ export default function Home() {
     window.addEventListener('sociality:close-post-toast', handleClosePostToast);
 
     return () => {
-      window.removeEventListener('sociality:close-post-toast', handleClosePostToast);
+      window.removeEventListener(
+        'sociality:close-post-toast',
+        handleClosePostToast
+      );
     };
   }, []);
 
@@ -121,7 +130,8 @@ export default function Home() {
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
 
   const logoutMutation = useLogoutMutation();
-  const feedQuery = useFeedQuery({ page: 1, limit: 20 }, isAuthenticated);
+  const feedQuery = useInfiniteFeedQuery(isAuthenticated);
+  const guestFeedQuery = useGuestFeedQuery(lastLoggedInUsername, !isAuthenticated);
   const router = useRouter();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -173,45 +183,10 @@ export default function Home() {
 
   return (
     <main className='min-h-screen bg-black pb-28 text-white'>
-<SocialityNavbar showPostSuccess={showPostSuccess} />
+      <SocialityNavbar showPostSuccess={showPostSuccess} />
 
       {/* Timeline */}
       <div className='mx-auto w-full max-w-[648px] px-4 pt-5 sm:px-6 sm:pt-8'>
-        {!isAuthenticated && (
-          <section className='mb-6 rounded-2xl border border-purple-400/20 bg-gradient-to-br from-purple-950/50 via-[#111014] to-black p-5 sm:p-6'>
-            <p className='text-xs font-semibold uppercase tracking-[0.2em] text-purple-300'>
-              Welcome to Sociality
-            </p>
-
-            <h1 className='mt-3 text-2xl font-bold tracking-tight sm:text-3xl'>
-              Ceritakan duniamu.
-              <span className='block text-purple-400'>
-                Terhubung lebih dekat.
-              </span>
-            </h1>
-
-            <p className='mt-3 max-w-md text-sm leading-6 text-white/55'>
-              Bergabunglah untuk berbagi momen, menemukan cerita, dan terhubung
-              dengan komunitas.
-            </p>
-
-            <div className='mt-5 flex flex-wrap gap-3'>
-              <Link
-                href='/register'
-                className='rounded-full bg-purple-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-purple-500'
-              >
-                Mulai sekarang
-              </Link>
-              <Link
-                href='/login'
-                className='rounded-full border border-white/15 px-5 py-2.5 text-sm font-medium text-white/80 transition hover:bg-white/[0.06]'
-              >
-                Login
-              </Link>
-            </div>
-          </section>
-        )}
-
         <section aria-label='Timeline postingan' className='space-y-5'>
           {isAuthenticated && feedQuery.isPending && (
             <div className='rounded-2xl border border-white/10 bg-[#111014] p-8 text-center'>
@@ -240,7 +215,7 @@ export default function Home() {
 
           {isAuthenticated &&
             feedQuery.isSuccess &&
-            feedQuery.data.data.items.length === 0 && (
+            feedQuery.data.pages.every((page) => page.data.items.length === 0) && (
               <div className='rounded-2xl border border-dashed border-white/15 bg-[#111014] px-6 py-12 text-center'>
                 <div className='mx-auto flex size-14 items-center justify-center rounded-full bg-purple-500/10 text-purple-300'>
                   <PlusIcon />
@@ -254,26 +229,92 @@ export default function Home() {
 
           {isAuthenticated &&
             feedQuery.isSuccess &&
-            feedQuery.data.data.items.map((post) => (
+            feedQuery.data.pages.flatMap((page) => page.data.items).map((post) => (
               <PostCard key={post.id} post={post} />
             ))}
 
-          {!isAuthenticated && (
-            <div className='rounded-2xl border border-white/10 bg-[#111014] px-6 py-10 text-center'>
-              <div className='mx-auto flex size-12 items-center justify-center rounded-full bg-purple-500/10 text-purple-300'>
-                <HomeIcon active />
-              </div>
-              <h2 className='mt-4 font-semibold'>Feed komunitasmu menanti</h2>
-              <p className='mx-auto mt-2 max-w-sm text-sm leading-6 text-white/45'>
-                Login untuk melihat postingan dan berinteraksi dengan pengguna
-                Sociality.
+          {isAuthenticated && feedQuery.isSuccess && (
+            <div className='flex justify-center py-4'>
+              {feedQuery.hasNextPage ? (
+                <button
+                  type='button'
+                  onClick={() => feedQuery.fetchNextPage()}
+                  disabled={feedQuery.isFetchingNextPage}
+                  className='rounded-full bg-purple-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-purple-500 disabled:cursor-not-allowed disabled:opacity-50'
+                >
+                  {feedQuery.isFetchingNextPage ? 'Memuat...' : 'Load More'}
+                </button>
+              ) : (
+                <p className='text-sm text-white/40'>
+                  Semua postingan sudah ditampilkan.
+                </p>
+              )}
+            </div>
+          )}
+
+          {!isAuthenticated && !lastLoggedInUsername && (
+            <div className='rounded-2xl border border-dashed border-white/15 bg-[#111014] px-6 py-12 text-center'>
+              <h2 className='font-semibold'>Timeline belum tersedia</h2>
+              <p className='mt-2 text-sm leading-6 text-white/45'>
+                Login terlebih dahulu agar postingan dari akun terakhir yang login dapat ditampilkan saat menjadi guest.
               </p>
               <Link
                 href='/login'
-                className='mt-5 inline-flex rounded-full bg-purple-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-purple-500'
+                className='mt-5 inline-flex rounded-full bg-purple-600 px-5 py-2 text-sm font-semibold transition hover:bg-purple-500'
               >
-                Lihat feed
+                Login
               </Link>
+            </div>
+          )}
+          {!isAuthenticated && lastLoggedInUsername && guestFeedQuery.isPending && (
+            <div className='rounded-2xl border border-white/10 bg-[#111014] p-8 text-center'>
+              <div className='mx-auto size-7 animate-spin rounded-full border-2 border-white/10 border-t-purple-500' />
+              <p className='mt-4 text-sm text-white/50'>
+                Memuat postingan publik...
+              </p>
+            </div>
+          )}
+
+          {!isAuthenticated && lastLoggedInUsername && guestFeedQuery.isError && (
+            <div className='rounded-2xl border border-red-500/20 bg-[#111014] p-5'>
+              <p className='font-semibold text-red-400'>
+                Postingan publik gagal dimuat.
+              </p>
+              <button
+                type='button'
+                onClick={() => guestFeedQuery.refetch()}
+                className='mt-4 rounded-full bg-purple-600 px-5 py-2 text-sm font-semibold transition hover:bg-purple-500'
+              >
+                Coba lagi
+              </button>
+            </div>
+          )}
+
+          {!isAuthenticated &&
+            guestFeedQuery.isSuccess &&
+            guestFeedQuery.data.length === 0 && (
+              <div className='rounded-2xl border border-dashed border-white/15 bg-[#111014] px-6 py-12 text-center'>
+                <h2 className='font-semibold'>Belum ada postingan publik</h2>
+                <p className='mt-2 text-sm text-white/45'>
+                  Silakan coba lagi nanti.
+                </p>
+              </div>
+            )}
+
+          {!isAuthenticated &&
+            guestFeedQuery.isSuccess &&
+            guestFeedQuery.data.slice(0, 5).map((post) => (
+              <PostCard key={post.id} post={post} />
+            ))}
+          {!isAuthenticated && guestFeedQuery.isSuccess && guestFeedQuery.data.length > 0 && (
+            <div className='flex justify-center py-6'>
+              <button
+                type='button'
+                onClick={() => router.push('/login')}
+                className='rounded-full bg-purple-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-purple-500'
+              >
+                Load More
+              </button>
             </div>
           )}
         </section>

@@ -1,6 +1,11 @@
 'use client';
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 import {
   addPostComment,
   createPost,
@@ -17,11 +22,26 @@ import {
   type FeedParams,
 } from './posts.service';
 import type { CommentsParams } from './posts.types';
+import { getGuestFeed } from './guest-feed.service';
 
 export function useFeedQuery(params: FeedParams = {}, enabled = true) {
   return useQuery({
     queryKey: ['feed', params.page ?? 1, params.limit ?? 20],
     queryFn: () => getFeed(params),
+    enabled,
+  });
+}
+
+export function useInfiniteFeedQuery(enabled = true) {
+  return useInfiniteQuery({
+    queryKey: ['feed', 'infinite'],
+    initialPageParam: 1,
+    queryFn: ({ pageParam }) =>
+      getFeed({ page: pageParam, limit: 20 }),
+    getNextPageParam: (lastPage, _allPages, lastPageParam) =>
+      lastPage.data.items.length === 20
+        ? lastPageParam + 1
+        : undefined,
     enabled,
   });
 }
@@ -168,5 +188,17 @@ export function useLikedPostsQuery(params: FeedParams = {}, enabled = true) {
     queryKey: ['liked-posts', params.page ?? 1, params.limit ?? 20],
     queryFn: () => getLikedPosts(params),
     enabled,
+  });
+}
+
+export function useGuestFeedQuery(
+  username: string | null,
+  enabled = true
+) {
+  return useQuery({
+    queryKey: ['guest-feed', username],
+    queryFn: () => getGuestFeed(username!),
+    enabled: enabled && Boolean(username),
+    staleTime: 60 * 1000,
   });
 }

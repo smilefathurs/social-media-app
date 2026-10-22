@@ -1,6 +1,7 @@
 import type { AuthUser } from './auth.types';
 
 const AUTH_STORAGE_KEY = 'social-media-app-auth';
+const LAST_LOGGED_IN_USERNAME_KEY = 'social-media-app-last-username';
 
 export interface StoredAuthSession {
   token: string;
@@ -9,11 +10,22 @@ export interface StoredAuthSession {
 
 export function saveAuthSession(session: StoredAuthSession): void {
   localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(session));
+  localStorage.setItem(
+    LAST_LOGGED_IN_USERNAME_KEY,
+    session.user.username
+  );
+}
+
+export function loadLastLoggedInUsername(): string | null {
+  const username = localStorage
+    .getItem(LAST_LOGGED_IN_USERNAME_KEY)
+    ?.trim();
+
+  return username || null;
 }
 
 export function loadAuthSession(): StoredAuthSession | null {
   const stored = localStorage.getItem(AUTH_STORAGE_KEY);
-
   if (!stored) return null;
 
   try {
@@ -40,5 +52,6 @@ export function loadAuthSession(): StoredAuthSession | null {
 }
 
 export function clearAuthSession(): void {
+  // Hanya hapus sesi aktif; username terakhir tetap disimpan.
   localStorage.removeItem(AUTH_STORAGE_KEY);
 }
