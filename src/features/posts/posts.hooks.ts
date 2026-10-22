@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import {
   useInfiniteQuery,
@@ -19,6 +19,7 @@ import {
   savePost,
   unsavePost,
   getLikedPosts,
+  getPostLikes,
   type FeedParams,
 } from './posts.service';
 import type { CommentsParams } from './posts.types';
@@ -200,5 +201,25 @@ export function useGuestFeedQuery(
     queryFn: () => getGuestFeed(username!),
     enabled: enabled && Boolean(username),
     staleTime: 60 * 1000,
+  });
+}
+
+export function useInfinitePostLikesQuery(
+  postId: number,
+  enabled = true
+) {
+  return useInfiniteQuery({
+    queryKey: ['post-likes', postId],
+    initialPageParam: 1,
+    queryFn: ({ pageParam }) =>
+      getPostLikes(postId, {
+        page: pageParam,
+        limit: 20,
+      }),
+    getNextPageParam: (lastPage) => {
+      const { page, totalPages } = lastPage.data.pagination;
+      return page < totalPages ? page + 1 : undefined;
+    },
+    enabled: enabled && postId > 0,
   });
 }

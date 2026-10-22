@@ -1,4 +1,4 @@
-export interface PostAuthor {
+﻿export interface PostAuthor {
   id: number;
   username: string;
   name: string;
@@ -93,6 +93,35 @@ export interface LikedPostsResponse {
   message: string;
   data: {
     posts: Post[];
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+    };
+  };
+}
+
+export interface PostLikeUser {
+  id: number;
+  username: string;
+  name: string;
+  avatarUrl: string | null;
+  isFollowedByMe: boolean;
+  isMe: boolean;
+  followsMe: boolean;
+}
+
+export interface PostLikesParams {
+  page?: number;
+  limit?: number;
+}
+
+export interface PostLikesResponse {
+  success: boolean;
+  message: string;
+  data: {
+    users: PostLikeUser[];
     pagination: {
       page: number;
       limit: number;

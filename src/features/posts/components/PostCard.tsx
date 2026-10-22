@@ -14,6 +14,7 @@ import {
 import { useAppSelector } from '@/lib/redux/hooks';
 import type { Post } from '../posts.types';
 import PostComments from './PostComments';
+import PostLikesModal from './PostLikesModal';
 
 interface PostCardProps {
   post: Post;
@@ -155,6 +156,7 @@ function CaptionText({
 export default function PostCard({ post }: PostCardProps) {
   const authorName = post.author.name || post.author.username;
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
+  const [isLikesOpen, setIsLikesOpen] = useState(false);
   const [shareMessage, setShareMessage] = useState('');
   const [imageFailed, setImageFailed] = useState(false);
 
@@ -237,7 +239,7 @@ export default function PostCard({ post }: PostCardProps) {
   }
 
   return (
-    <article id={`post-${post.id}`} className='text-white'>
+    <article id={`post-${post.id}`} className='relative text-white'>
       {/* Header penulis */}
       <div className='mx-auto flex w-full max-w-[600px] items-center gap-3 px-4 py-4 sm:px-0'>
         <Link
@@ -295,7 +297,14 @@ export default function PostCard({ post }: PostCardProps) {
 
       {/* Gambar postingan */}
       {post.imageUrl && !imageFailed && (
-        <div className='relative mx-auto aspect-square w-full max-w-[600px] overflow-hidden bg-black'>
+        <div className='relative mx-auto w-full max-w-[600px]'>
+          {isLikesOpen && (
+            <PostLikesModal
+              postId={post.id}
+              onClose={() => setIsLikesOpen(false)}
+            />
+          )}
+          <div className='relative aspect-square w-full overflow-hidden bg-black'>
           <Image
             src={post.imageUrl}
             alt={`Postingan oleh ${authorName}`}
@@ -306,6 +315,7 @@ export default function PostCard({ post }: PostCardProps) {
             className='rounded-md object-cover'
             sizes='(max-width: 600px) 100vw, 600px'
           />
+          </div>
         </div>
       )}
 
@@ -316,28 +326,37 @@ export default function PostCard({ post }: PostCardProps) {
 
       {/* Aksi postingan */}
       <div className='mx-auto flex w-full max-w-[600px] items-center gap-5 px-4 pb-4 pt-4 sm:gap-6 sm:px-0'>
-        <button
-          type='button'
-          onClick={handleLikeToggle}
-          disabled={!isAuthenticated || isLikePending}
-          aria-pressed={post.likedByMe}
-          aria-label={post.likedByMe ? 'Batalkan suka' : 'Sukai postingan'}
-          title={
-            isAuthenticated
-              ? post.likedByMe
-                ? 'Batalkan suka'
-                : 'Sukai postingan'
-              : 'Login untuk menyukai postingan'
-          }
-          className={`cursor-pointer inline-flex items-center gap-2 rounded-lg text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
-            post.likedByMe
-              ? 'text-purple-400'
-              : 'text-white/60 hover:text-purple-300'
-          }`}
-        >
-          <Icon name='heart' filled={post.likedByMe} className='size-[22px]' />
-          <span>{post.likeCount}</span>
-        </button>
+        <div className="inline-flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleLikeToggle}
+            disabled={!isAuthenticated || isLikePending}
+            aria-pressed={post.likedByMe}
+            aria-label={post.likedByMe ? 'Batalkan suka' : 'Sukai postingan'}
+            title={
+              isAuthenticated
+                ? post.likedByMe
+                  ? 'Batalkan suka'
+                  : 'Sukai postingan'
+                : 'Login untuk menyukai postingan'
+            }
+            className={`inline-flex cursor-pointer items-center rounded-lg text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+              post.likedByMe
+                ? 'text-purple-400'
+                : 'text-white/60 hover:text-purple-300'
+            }`}
+          >
+            <Icon name="heart" filled={post.likedByMe} className="size-[22px]" />
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsLikesOpen(true)}
+            aria-label={`Lihat ${post.likeCount} pengguna yang menyukai postingan`}
+            className="cursor-pointer rounded-md text-sm text-white/60 transition-colors hover:text-purple-300"
+          >
+            {post.likeCount}
+          </button>
+        </div>
 
         <button
           type='button'

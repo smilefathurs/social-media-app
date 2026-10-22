@@ -329,7 +329,7 @@ export default function Home() {
           href='/'
           aria-label='Home'
           aria-current='page'
-          className='flex size-11 items-center justify-center rounded-full bg-purple-600 text-white shadow-lg shadow-purple-950/40 transition hover:bg-purple-500'
+          className='flex size-11 items-center justify-center rounded-full text-purple-400 transition hover:text-purple-300'
         >
           <HomeIcon active />
         </Link>

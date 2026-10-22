@@ -1,10 +1,12 @@
-import api from '@/lib/api';
+﻿import api from '@/lib/api';
 import type {
   FeedResponse,
   SavedPostsParams,
   SavedPostsResponse,
   LikedPostsParams,
   LikedPostsResponse,
+  PostLikesParams,
+  PostLikesResponse,
 } from './posts.types';
 
 export interface FeedParams {
@@ -113,6 +115,23 @@ export async function getLikedPosts(
       limit: params.limit ?? 20,
     },
   });
+
+  return response.data;
+}
+
+export async function getPostLikes(
+  postId: number,
+  params: PostLikesParams = {}
+): Promise<PostLikesResponse> {
+  const response = await api.get<PostLikesResponse>(
+    `/api/posts/${postId}/likes`,
+    {
+      params: {
+        page: params.page ?? 1,
+        limit: params.limit ?? 20,
+      },
+    }
+  );
 
   return response.data;
 }
