@@ -388,26 +388,110 @@ export default function SocialityNavbar({
               <SearchIcon />
             </button>
             {isAuthenticated && user?.username ? (
-              <Link
-                href={profileHref}
-                aria-label='Lihat profil'
-                className='rounded-full ring-offset-2 ring-offset-black transition hover:ring-2 hover:ring-purple-500'
-              >
-                {user.avatarUrl ? (
-                  <Image
-                    src={user.avatarUrl}
-                    alt='Foto profil'
-                    width={36}
-                    height={36}
-                    unoptimized
-                    className='size-9 rounded-full object-cover'
-                  />
-                ) : (
-                  <span className='flex size-9 items-center justify-center rounded-full bg-purple-500/20 font-semibold text-purple-300'>
-                    {(user.name || user.username).charAt(0).toUpperCase()}
-                  </span>
+              <div ref={profileMenuRef} className='relative'>
+                <button
+                  type='button'
+                  onClick={() => setIsProfileMenuOpen((previous) => !previous)}
+                  aria-label='Buka menu profil'
+                  aria-expanded={isProfileMenuOpen}
+                  aria-haspopup='menu'
+                  className='flex size-9 items-center justify-center rounded-full ring-offset-2 ring-offset-black transition hover:ring-2 hover:ring-purple-500'
+                >
+                  {user.avatarUrl ? (
+                    <Image
+                      src={user.avatarUrl}
+                      alt='Foto profil'
+                      width={36}
+                      height={36}
+                      unoptimized
+                      className='size-9 rounded-full object-cover'
+                    />
+                  ) : (
+                    <span className='flex size-9 items-center justify-center rounded-full bg-purple-500/20 text-sm font-semibold text-purple-300'>
+                      {(user.name || user.username).charAt(0).toUpperCase()}
+                    </span>
+                  )}
+                </button>
+
+                {isProfileMenuOpen && (
+                  <div
+                    role='menu'
+                    className='absolute right-0 top-full z-50 mt-2 w-52 overflow-hidden rounded-xl border border-white/10 bg-[#111016] p-1.5 shadow-2xl shadow-black/50'
+                  >
+                    <div className='border-b border-white/10 px-3 py-2'>
+                      <p className='truncate text-sm font-semibold text-white'>
+                        {user.name ?? user.username}
+                      </p>
+                      <p className='truncate text-xs text-white/45'>
+                        @{user.username}
+                      </p>
+                    </div>
+
+                    <Link
+                      href={profileHref}
+                      role='menuitem'
+                      onClick={() => setIsProfileMenuOpen(false)}
+                      className='mt-1 flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white/75 transition hover:bg-purple-500/10 hover:text-purple-300'
+                    >
+                      <UserIcon />
+                      Profile
+                    </Link>
+
+                    <Link
+                      href='/saved'
+                      role='menuitem'
+                      onClick={() => setIsProfileMenuOpen(false)}
+                      className='flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white/75 transition hover:bg-purple-500/10 hover:text-purple-300'
+                    >
+                      <BookmarkIcon />
+                      Saved Posts
+                    </Link>
+
+                    <Link
+                      href='/liked'
+                      role='menuitem'
+                      onClick={() => setIsProfileMenuOpen(false)}
+                      className='flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white/75 transition hover:bg-purple-500/10 hover:text-purple-300'
+                    >
+                      <HeartIcon />
+                      Liked Posts
+                    </Link>
+
+                    <Link
+                      href='/create-post'
+                      role='menuitem'
+                      onClick={() => setIsProfileMenuOpen(false)}
+                      className='flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white/75 transition hover:bg-purple-500/10 hover:text-purple-300'
+                    >
+                      <PlusIcon />
+                      Create Post
+                    </Link>
+
+                    <button
+                      type='button'
+                      role='menuitem'
+                      onClick={() => logoutMutation.mutate()}
+                      disabled={logoutMutation.isPending}
+                      className='flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm text-red-400 transition hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-50'
+                    >
+                      <svg
+                        viewBox='0 0 24 24'
+                        fill='none'
+                        stroke='currentColor'
+                        strokeWidth='1.8'
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                        className='size-5 shrink-0'
+                        aria-hidden='true'
+                      >
+                        <path d='M10 17l5-5-5-5M15 12H3' />
+                        <path d='M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6' />
+                      </svg>
+                      {logoutMutation.isPending ? 'Sedang keluar...' : 'Logout'}
+                    </button>
+                  </div>
                 )}
-              </Link>
+              </div>
             ) : (
               <button
                 type='button'

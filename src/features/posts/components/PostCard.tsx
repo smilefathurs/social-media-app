@@ -124,7 +124,7 @@ function CaptionText({
   }, [caption, username]);
 
   return (
-    <div className='mx-auto w-full max-w-[600px] px-4 pt-4 sm:px-0'>
+    <div className='mx-auto w-full max-w-[600px] px-4 pt-3 sm:px-0 sm:pt-4'>
       <p
         ref={captionRef}
         className={`break-words text-sm leading-6 text-white/85 ${
@@ -241,7 +241,7 @@ export default function PostCard({ post }: PostCardProps) {
   return (
     <article id={`post-${post.id}`} className='relative text-white'>
       {/* Header penulis */}
-      <div className='mx-auto flex w-full max-w-[600px] items-center gap-3 px-4 py-4 sm:px-0'>
+      <div className='mx-auto flex w-full max-w-[600px] items-center gap-3 px-4 py-3 sm:px-0 sm:py-4'>
         <Link
           href={`/users/${encodeURIComponent(post.author.username)}`}
           className='shrink-0 rounded-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-purple-500'
@@ -312,7 +312,7 @@ export default function PostCard({ post }: PostCardProps) {
             unoptimized
             onLoad={handleImageLoad}
             onError={() => setImageFailed(true)}
-            className='rounded-md object-cover'
+            className='rounded-xl object-cover sm:rounded-md'
             sizes='(max-width: 600px) 100vw, 600px'
           />
           </div>
@@ -325,7 +325,7 @@ export default function PostCard({ post }: PostCardProps) {
       )}
 
       {/* Aksi postingan */}
-      <div className='mx-auto flex w-full max-w-[600px] items-center gap-5 px-4 pb-4 pt-4 sm:gap-6 sm:px-0'>
+      <div className='mx-auto flex w-full max-w-[600px] items-center gap-4 px-4 pb-3 pt-2 sm:gap-6 sm:px-0 sm:pb-4 sm:pt-4'>
         <div className="inline-flex items-center gap-2">
           <button
             type="button"
