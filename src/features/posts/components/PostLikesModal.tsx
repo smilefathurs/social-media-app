@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useQueryClient } from '@tanstack/react-query';
@@ -67,27 +68,37 @@ export default function PostLikesModal({
     }
   }
 
-  return (
+  return createPortal(
     <div
-      className='absolute inset-x-0 bottom-0 z-40 flex max-h-full flex-col items-center justify-end text-white'
+      className='fixed inset-0 z-[100] flex items-end justify-center bg-black/70 text-white'
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}
     >
       <section
         role='dialog'
-        aria-modal='false'
+        aria-modal='true'
         aria-labelledby='post-likes-title'
-        className='relative mx-auto flex max-h-[min(530px,65dvh)] w-full max-w-[548px] flex-col text-white'
+        className='relative mx-auto flex max-h-[70dvh] w-full max-w-[548px] flex-col text-white sm:max-h-[min(530px,65dvh)]'
       >
-        <div className='relative mx-auto flex max-h-[min(530px,65dvh)] min-h-0 w-full max-w-[548px] flex-col overflow-hidden rounded-2xl border border-[#181D27] bg-[#0A0D12] p-5 shadow-2xl'>
+        <div className='relative mx-auto flex max-h-[70dvh] min-h-0 w-full flex-col overflow-hidden rounded-t-2xl border border-b-0 border-[#181D27] bg-[#0A0D12] p-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-2xl sm:max-h-[min(530px,65dvh)] sm:rounded-2xl sm:border-b sm:p-5'>
           <button
             type='button'
             onClick={onClose}
             aria-label='Tutup Likes'
-            className='absolute right-3 top-3 z-20 flex size-8 cursor-pointer items-center justify-center rounded-full text-2xl text-white/80 transition hover:text-white'
+            className='absolute right-3 top-3 z-20 flex size-9 cursor-pointer items-center justify-center rounded-full text-white/75 transition hover:bg-white/10 hover:text-white'
           >
-            ×
+            <svg
+              viewBox='0 0 24 24'
+              fill='none'
+              stroke='currentColor'
+              strokeWidth='2'
+              strokeLinecap='round'
+              className='size-5'
+              aria-hidden='true'
+            >
+              <path d='m18 6-12 12M6 6l12 12' />
+            </svg>
           </button>
           <h2
             id='post-likes-title'
@@ -200,6 +211,7 @@ export default function PostLikesModal({
           </div>
         </div>
       </section>
-    </div>
+    </div>,
+    document.body
   );
 }
