@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
@@ -120,16 +120,19 @@ export default function SocialityNavbar({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-  const profileMenuRef = useRef<HTMLDivElement>(null);
+  const desktopProfileMenuRef = useRef<HTMLDivElement>(null);
+  const mobileProfileMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!isProfileMenuOpen) return;
 
     function handleOutsideClick(event: MouseEvent) {
+      const target = event.target;
+
       if (
-        profileMenuRef.current &&
-        event.target instanceof Node &&
-        !profileMenuRef.current.contains(event.target)
+        target instanceof Node &&
+        !desktopProfileMenuRef.current?.contains(target) &&
+        !mobileProfileMenuRef.current?.contains(target)
       ) {
         setIsProfileMenuOpen(false);
       }
@@ -161,7 +164,15 @@ export default function SocialityNavbar({
         <div className='mx-auto flex h-[72px] max-w-6xl items-center justify-between gap-4 px-4 sm:px-6'>
           <Link
             href='/'
-            className='flex shrink-0 items-center gap-2.5'
+            onClick={(event) => {
+              const currentPath = window.location.pathname;
+
+              if (currentPath === '/') {
+                event.preventDefault();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }
+            }}
+            className='relative z-50 flex shrink-0 items-center gap-2.5'
             aria-label='Sociality Home'
           >
             <Image
@@ -185,7 +196,7 @@ export default function SocialityNavbar({
           {/* Header desktop */}
           <div className='hidden items-center gap-4 sm:flex'>
             {isAuthenticated ? (
-              <div ref={profileMenuRef} className='relative'>
+              <div ref={desktopProfileMenuRef} className='relative'>
                 <button
                   type='button'
                   onClick={() => setIsProfileMenuOpen((previous) => !previous)}
@@ -388,7 +399,7 @@ export default function SocialityNavbar({
               <SearchIcon />
             </button>
             {isAuthenticated && user?.username ? (
-              <div ref={profileMenuRef} className='relative'>
+              <div ref={mobileProfileMenuRef} className='relative'>
                 <button
                   type='button'
                   onClick={() => setIsProfileMenuOpen((previous) => !previous)}
@@ -550,13 +561,7 @@ export default function SocialityNavbar({
             </div>
           </div>
         )}
-        {isSearchOpen && (
-          <div className='border-t border-white/10 bg-[#0c0b10] px-4 py-4 sm:hidden'>
-            <div className='mx-auto max-w-[600px]'>
-              <UserSearch />
-            </div>
-          </div>
-        )}
+        {isSearchOpen && <UserSearch onClose={() => setIsSearchOpen(false)} />}
       </header>
     </>
   );

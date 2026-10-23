@@ -1,8 +1,9 @@
-'use client';
+﻿'use client';
 
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   useDeletePostMutation,
   useLikeMutation,
@@ -13,7 +14,7 @@ import {
 } from '../posts.hooks';
 import { useAppSelector } from '@/lib/redux/hooks';
 import type { Post } from '../posts.types';
-import PostComments from './PostComments';
+import PostCommentsModal from './PostCommentsModal';
 import PostLikesModal from './PostLikesModal';
 
 interface PostCardProps {
@@ -154,6 +155,7 @@ function CaptionText({
   );
 }
 export default function PostCard({ post }: PostCardProps) {
+  const router = useRouter();
   const authorName = post.author.name || post.author.username;
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const [isLikesOpen, setIsLikesOpen] = useState(false);
@@ -304,18 +306,32 @@ export default function PostCard({ post }: PostCardProps) {
               onClose={() => setIsLikesOpen(false)}
             />
           )}
-          <div className='relative aspect-square w-full overflow-hidden bg-black'>
-          <Image
-            src={post.imageUrl}
-            alt={`Postingan oleh ${authorName}`}
-            fill
-            unoptimized
-            onLoad={handleImageLoad}
-            onError={() => setImageFailed(true)}
-            className='rounded-xl object-cover sm:rounded-md'
-            sizes='(max-width: 600px) 100vw, 600px'
-          />
-          </div>
+          <button
+            type="button"
+            data-comment-modal-trigger
+            onClick={() => {
+              if (!isAuthenticated) {
+                router.push('/login');
+                return;
+              }
+              setIsCommentsOpen(true);
+            }}
+            aria-label="Buka postingan dan komentar"
+            className="relative block w-full cursor-pointer overflow-hidden rounded-xl bg-black text-left sm:rounded-md"
+          >
+            <div className="relative aspect-square w-full">
+              <Image
+                src={post.imageUrl}
+                alt={`Postingan oleh ${authorName}`}
+                fill
+                unoptimized
+                onLoad={handleImageLoad}
+                onError={() => setImageFailed(true)}
+                className="object-cover transition-opacity hover:opacity-90"
+                sizes="(max-width: 600px) 100vw, 600px"
+              />
+            </div>
+          </button>
         </div>
       )}
 
@@ -360,7 +376,7 @@ export default function PostCard({ post }: PostCardProps) {
 
         <button
           type='button'
-          onClick={() => setIsCommentsOpen((previous) => !previous)}
+          onClick={() => { if (!isAuthenticated) { router.push('/login'); return; } setIsCommentsOpen(true); }}
           aria-expanded={isCommentsOpen}
           aria-controls={`post-comments-${post.id}`}
           className={`cursor-pointer inline-flex items-center gap-2 rounded-lg text-sm transition-colors ${
@@ -432,15 +448,15 @@ export default function PostCard({ post }: PostCardProps) {
           Gagal menghapus postingan. Silakan coba lagi.
         </p>
       )}
-
       {isCommentsOpen && (
-        <div
-          id={`post-comments-${post.id}`}
-          className='border-t border-white/10'
-        >
-          <PostComments postId={post.id} />
-        </div>
+        <PostCommentsModal
+          post={post}
+          onClose={() => setIsCommentsOpen(false)}
+        />
       )}
     </article>
   );
 }
+
+
+
