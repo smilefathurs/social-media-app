@@ -7,6 +7,7 @@ import {
   usePostCommentsQuery,
   useAddPostCommentMutation,
   useDeletePostCommentMutation,
+  useDeletePostMutation,
   useLikeMutation,
   useUnlikeMutation,
   useSavePostMutation,
@@ -79,12 +80,14 @@ export default function PostCommentsModal({ post, onClose }: Props) {
   const [shareMessage, setShareMessage] = useState("");
   const [localLiked, setLocalLiked] = useState(post.likedByMe);
   const [localLikeCount, setLocalLikeCount] = useState(post.likeCount);
+  const [postMenuOpen, setPostMenuOpen] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const user = useAppSelector((state) => state.auth.user);
   const commentsQuery = usePostCommentsQuery(post.id, { page: 1, limit: 30 });
   const addMutation = useAddPostCommentMutation(post.id);
   const deleteMutation = useDeletePostCommentMutation(post.id);
+  const deletePostMutation = useDeletePostMutation();
   const likeMutation = useLikeMutation();
   const unlikeMutation = useUnlikeMutation();
   const saveMutation = useSavePostMutation();
@@ -95,6 +98,20 @@ export default function PostCommentsModal({ post, onClose }: Props) {
   const isSaved = savedPosts.some((item) => item.id === post.id);
   const comments = commentsQuery.data?.data.comments ?? [];
   const authorName = post.author.name || post.author.username;
+  function handleDeletePost() {
+    if (user?.id !== post.author.id || deletePostMutation.isPending) return;
+
+    if (!window.confirm("Apakah kamu yakin ingin menghapus postingan ini?")) {
+      return;
+    }
+
+    deletePostMutation.mutate(post.id, {
+      onSuccess: () => {
+        setPostMenuOpen(false);
+        onClose();
+      },
+    });
+  }
 
   useEffect(() => {
     setMounted(true);
@@ -244,6 +261,41 @@ export default function PostCommentsModal({ post, onClose }: Props) {
             </p>
           )}
         </div>
+        {user?.id === post.author.id && (
+          <div className="relative ml-auto shrink-0">
+            <button
+              type="button"
+              aria-label="Menu postingan"
+              aria-haspopup="menu"
+              aria-expanded={postMenuOpen}
+              onClick={() => setPostMenuOpen((open) => !open)}
+              className="flex size-9 items-center justify-center rounded-full text-white/60 transition hover:bg-white/10 hover:text-white"
+            >
+              <svg viewBox="0 0 24 24" className="size-5" fill="currentColor" aria-hidden="true">
+                <circle cx="5" cy="12" r="1.8" />
+                <circle cx="12" cy="12" r="1.8" />
+                <circle cx="19" cy="12" r="1.8" />
+              </svg>
+            </button>
+
+            {postMenuOpen && (
+              <div
+                role="menu"
+                className="absolute right-0 top-10 z-30 w-44 rounded-xl border border-white/10 bg-[#171A22] p-1 shadow-xl"
+              >
+                <button
+                  type="button"
+                  role="menuitem"
+                  disabled={deletePostMutation.isPending}
+                  onClick={handleDeletePost}
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm text-red-300 hover:bg-red-500/10 disabled:opacity-50"
+                >
+                  Delete Post
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {commentsQuery.isLoading && (
@@ -403,16 +455,6 @@ export default function PostCommentsModal({ post, onClose }: Props) {
             aria-label="Post comments"
             className="flex min-w-0 flex-[2] flex-col border-l border-white/10 bg-[#0A0D12]"
           >
-            <header className="flex shrink-0 items-center gap-3 border-b border-white/10 p-4">
-              <Avatar src={post.author.avatarUrl} name={authorName} size="size-9" />
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold">{authorName}</p>
-                <p className="truncate text-xs text-white/45">@{post.author.username}</p>
-              </div>
-              <button type="button" onClick={onClose} aria-label="Close" className="rounded-lg px-2 py-1 text-2xl text-white/60 hover:bg-white/10 hover:text-white">
-                ×
-              </button>
-            </header>
 
             {commentList}
 
