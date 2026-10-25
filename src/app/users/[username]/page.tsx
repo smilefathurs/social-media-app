@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -12,52 +13,200 @@ import {
   useUserPostsQuery,
   useUserProfileQuery,
 } from '@/features/users/users-profile.hooks';
+import {
+  useSavedPostsQuery,
+  usePostDetailQuery,
+} from '@/features/posts/posts.hooks';
+import type { Post, SavedPost } from '@/features/posts/posts.types';
+import PostCommentsModal from '@/features/posts/components/PostCommentsModal';
+import SocialityNavbar from '@/components/SocialityNavbar';
+import ProfileBottomNav from '@/components/ProfileBottomNav';
 
-function formatPostDate(value: string): string {
-  const date = new Date(value);
+type ProfileTab = 'gallery' | 'saved';
 
-  if (Number.isNaN(date.getTime())) return value;
+function BackIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+      className="size-6" aria-hidden="true">
+      <path d="m15 18-6-6 6-6" />
+    </svg>
+  );
+}
 
-  return new Intl.DateTimeFormat('id-ID', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(date);
+function ShareIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+      className="size-5" aria-hidden="true">
+      <circle cx="18" cy="5" r="3" />
+      <circle cx="6" cy="12" r="3" />
+      <circle cx="18" cy="19" r="3" />
+      <path d="m8.7 10.7 6.6-4.4m-6.6 7 6.6 4.1" />
+    </svg>
+  );
+}
+
+function GalleryIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+      className="size-5" aria-hidden="true">
+      <rect x="3" y="3" width="7" height="7" rx="1" />
+      <rect x="14" y="3" width="7" height="7" rx="1" />
+      <rect x="3" y="14" width="7" height="7" rx="1" />
+      <rect x="14" y="14" width="7" height="7" rx="1" />
+    </svg>
+  );
+}
+
+function BookmarkIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+      className="size-5" aria-hidden="true">
+      <path d="M6 4.5A1.5 1.5 0 0 1 7.5 3h9A1.5 1.5 0 0 1 18 4.5V21l-6-4-6 4V4.5Z" />
+    </svg>
+  );
+}
+
+function Avatar({
+  src,
+  name,
+  size = 'large',
+}: {
+  src: string | null;
+  name: string;
+  size?: 'large' | 'small';
+}) {
+  const sizeClass = size === 'large' ? 'size-24 sm:size-28' : 'size-9';
+
+  if (src) {
+    return (
+      <Image
+        src={src}
+        alt={`Avatar ${name}`}
+        width={size === 'large' ? 112 : 36}
+        height={size === 'large' ? 112 : 36}
+        unoptimized
+        className={`${sizeClass} shrink-0 rounded-full object-cover`}
+      />
+    );
+  }
+
+  return (
+    <div className={`${sizeClass} flex shrink-0 items-center justify-center rounded-full bg-purple-500/20 font-bold text-purple-300 ${size === 'large' ? 'text-3xl' : 'text-sm'}`}>
+      {name.charAt(0).toUpperCase()}
+    </div>
+  );
+}
+
+function PostTile({
+  post,
+  username,
+  onClick,
+}: {
+  post: Post | SavedPost;
+  username: string;
+  onClick: () => void;
+}) {
+  return (
+    <article
+      className="group relative aspect-square overflow-hidden rounded-md bg-[#211e29]"
+    >
+      {post.imageUrl ? (
+        <Image
+          src={post.imageUrl}
+          alt={post.caption || `Postingan ${username}`}
+          fill
+          unoptimized
+          sizes="(max-width: 640px) 33vw, 270px"
+          className="object-cover transition duration-300 group-hover:scale-105"
+        />
+      ) : (
+        <div className="flex h-full items-center justify-center p-3 text-center text-xs text-white/50">
+          {post.caption || 'Postingan tanpa gambar'}
+        </div>
+      )}
+      {post.caption && (
+        <div className="absolute inset-x-0 bottom-0 line-clamp-3 bg-gradient-to-t from-black/85 to-transparent px-2 pb-2 pt-8 text-xs text-white opacity-0 transition group-hover:opacity-100">
+          {post.caption}
+        </div>
+      )}
+      <button
+        type="button"
+        onClick={onClick}
+        aria-label={`Buka postingan ${username}: ${post.caption || 'tanpa caption'}`}
+        className="absolute inset-0 z-10 cursor-pointer"
+      >
+        <span className="sr-only">Buka postingan</span>
+      </button>
+    </article>
+  );
 }
 
 export default function UserProfilePage() {
   const params = useParams<{ username: string }>();
   const username = decodeURIComponent(params.username);
+  const [activeTab, setActiveTab] = useState<ProfileTab>('gallery');
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+  const [selectedSavedPostId, setSelectedSavedPostId] = useState<number | null>(null);
 
   const profileQuery = useUserProfileQuery(username);
   const postsQuery = useUserPostsQuery(username);
+  const profile = profileQuery.data?.data;
+  const savedQuery = useSavedPostsQuery(
+    { page: 1, limit: 20 },
+    Boolean(profile?.isMe) && activeTab === 'saved'
+  );
+  const postDetailQuery = usePostDetailQuery(
+    selectedSavedPostId ?? 0,
+    selectedSavedPostId !== null
+  );
 
   const followMutation = useFollowUserMutation();
   const unfollowMutation = useUnfollowUserMutation();
 
-  const profile = profileQuery.data?.data;
   const posts = postsQuery.data?.data.posts ?? [];
-
-  const isFollowPending =
-    followMutation.isPending || unfollowMutation.isPending;
+  const savedPosts = savedQuery.data?.data.posts ?? [];
+  const isFollowPending = followMutation.isPending || unfollowMutation.isPending;
 
   function handleFollowToggle() {
     if (!profile || isFollowPending || profile.isMe) return;
 
-    if (profile.isFollowing) {
-      unfollowMutation.mutate(profile.username, {
-        onSuccess: () => profileQuery.refetch(),
-      });
-    } else {
-      followMutation.mutate(profile.username, {
-        onSuccess: () => profileQuery.refetch(),
-      });
+    const mutation = profile.isFollowing ? unfollowMutation : followMutation;
+    mutation.mutate(profile.username, {
+      onSuccess: () => profileQuery.refetch(),
+    });
+  }
+
+  async function handleShare() {
+    const url = window.location.href;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `Profil ${profile?.name || username}`,
+          url,
+        });
+      } catch {
+        // Pengguna mungkin membatalkan dialog berbagi.
+      }
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(url);
+      window.alert('Tautan profil berhasil disalin.');
+    } catch {
+      window.alert('Tidak dapat menyalin tautan profil pada browser ini.');
     }
   }
 
   if (profileQuery.isPending) {
     return (
-      <main className='min-h-screen bg-gray-50 px-4 py-10 text-gray-900 dark:bg-gray-950 dark:text-white'>
-        <div className='mx-auto max-w-3xl rounded-xl border border-gray-200 bg-white p-6 text-sm text-gray-500 dark:border-gray-800 dark:bg-gray-900'>
+      <main className="min-h-screen bg-[#0d0b11] px-4 py-10 text-white">
+        <div className="mx-auto max-w-[812px] text-sm text-white/60">
           Memuat profil pengguna...
         </div>
       </main>
@@ -66,16 +215,13 @@ export default function UserProfilePage() {
 
   if (profileQuery.isError || !profile) {
     return (
-      <main className='min-h-screen bg-gray-50 px-4 py-10 text-gray-900 dark:bg-gray-950 dark:text-white'>
-        <div className='mx-auto max-w-3xl rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900'>
-          <h1 className='text-lg font-semibold'>Profil tidak dapat dimuat</h1>
-          <p className='mt-2 text-sm text-gray-500'>
+      <main className="min-h-screen bg-[#0d0b11] px-4 py-10 text-white">
+        <div className="mx-auto max-w-[812px] rounded-2xl border border-white/10 bg-[#17151d] p-6">
+          <h1 className="text-lg font-semibold">Profil tidak dapat dimuat</h1>
+          <p className="mt-2 text-sm text-white/60">
             Pengguna mungkin tidak ditemukan atau terjadi masalah koneksi.
           </p>
-          <Link
-            href='/'
-            className='mt-4 inline-flex rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700'
-          >
+          <Link href="/" className="mt-5 inline-flex rounded-xl bg-purple-600 px-4 py-2 text-sm font-semibold hover:bg-purple-500">
             Kembali ke Home
           </Link>
         </div>
@@ -83,189 +229,284 @@ export default function UserProfilePage() {
     );
   }
 
+  const displayName = profile.name || profile.username;
+  const visiblePosts = activeTab === 'gallery' ? posts : savedPosts;
+  const isContentPending = activeTab === 'gallery' ? postsQuery.isPending : savedQuery.isPending;
+  const isContentError = activeTab === 'gallery' ? postsQuery.isError : savedQuery.isError;
+  const hasContent = visiblePosts.length > 0;
+
   return (
-    <main className='min-h-screen bg-gray-50 px-4 py-8 text-gray-900 dark:bg-gray-950 dark:text-white'>
-      <div className='mx-auto max-w-3xl space-y-6'>
-        <header className='flex items-center justify-between'>
-          <Link href='/' className='text-xl font-bold text-blue-600'>
-            Sociality
-          </Link>
-          <Link
-            href='/'
-            className='rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800'
-          >
-            Kembali ke Home
-          </Link>
-        </header>
+    <main className="min-h-screen overflow-x-hidden bg-[#0d0b11] pb-28 text-white sm:pb-12">
+      <div className="hidden sm:block">
+        <SocialityNavbar />
+      </div>
 
-        <section className='rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900 sm:p-8'>
-          <div className='flex flex-col gap-5 sm:flex-row sm:items-start'>
-            {profile.avatarUrl ? (
-              <Image
-                src={profile.avatarUrl}
-                alt={`Avatar ${profile.name || profile.username}`}
-                width={112}
-                height={112}
-                unoptimized
-                className='size-24 rounded-full object-cover sm:size-28'
-              />
-            ) : (
-              <div className='flex size-24 shrink-0 items-center justify-center rounded-full bg-blue-100 text-3xl font-bold text-blue-700 dark:bg-blue-950 dark:text-blue-300 sm:size-28'>
-                {(profile.name || profile.username).charAt(0).toUpperCase()}
+      <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-white/[0.06] bg-[#0d0b11]/95 px-4 backdrop-blur-xl sm:hidden">
+        <Link href="/" aria-label="Kembali" className="flex size-10 items-center justify-center text-white/85">
+          <BackIcon />
+        </Link>
+        <h1 className="max-w-[65%] truncate text-base font-semibold">
+          {profile.username}
+        </h1>
+        <Avatar src={profile.avatarUrl} name={displayName} size="small" />
+      </header>
+
+      <div className="mx-auto w-full max-w-[812px] space-y-4 px-3 pt-4 sm:px-0 sm:pt-8">
+        <section className="rounded-2xl border border-white/[0.06] bg-[#17151d] p-4 sm:p-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-5">
+            <div className="flex min-w-0 items-center gap-4 sm:items-start">
+              <Avatar src={profile.avatarUrl} name={displayName} />
+              <div className="min-w-0 flex-1 sm:hidden">
+                <h2 className="break-words text-lg font-bold leading-tight">
+                  {displayName}
+                </h2>
+                <p className="mt-1 break-words text-sm text-white/50">
+                  @{profile.username}
+                </p>
               </div>
-            )}
+              <div className="hidden sm:block">
+                <h2 className="break-words text-xl font-bold">
+                  {displayName}
+                </h2>
+                <p className="mt-1 text-sm text-white/50">@{profile.username}</p>
+                {profile.bio && (
+                  <p className="mt-3 max-w-[460px] whitespace-pre-wrap break-words text-sm leading-6 text-white/75">
+                    {profile.bio}
+                  </p>
+                )}
+              </div>
+            </div>
 
-            <div className='min-w-0 flex-1'>
-              <h1 className='text-2xl font-bold'>
-                {profile.name || profile.username}
-              </h1>
-              <p className='mt-1 text-sm text-gray-500 dark:text-gray-400'>
-                @{profile.username}
-              </p>
-
-              {profile.bio && (
-                <p className='mt-4 whitespace-pre-wrap text-sm leading-6'>
-                  {profile.bio}
-                </p>
-              )}
-
-              {profile.isMe && <EditProfileForm profile={profile} />}
-
-              {!profile.isMe && (
-                <button
-                  type='button'
-                  onClick={handleFollowToggle}
-                  disabled={isFollowPending}
-                  className={`mt-4 rounded-lg px-5 py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
-                    profile.isFollowing
-                      ? 'border border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800'
-                      : 'bg-blue-600 text-white hover:bg-blue-700'
-                  }`}
-                >
-                  {isFollowPending
-                    ? 'Memproses...'
-                    : profile.isFollowing
-                      ? 'Following'
-                      : 'Follow'}
-                </button>
-              )}
-
-              {(followMutation.isError || unfollowMutation.isError) && (
-                <p role='alert' className='mt-2 text-sm text-red-600'>
-                  Gagal memperbarui status Follow. Silakan coba lagi.
-                </p>
+            <div className="flex shrink-0 items-center gap-2 sm:ml-auto">
+              {profile.isMe ? (
+                <>
+                  <div className="min-w-0 flex-1 sm:flex-none">
+                    <EditProfileForm profile={profile} />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleShare}
+                    aria-label="Bagikan profil"
+                    className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-white/10 text-white/75 transition hover:bg-white/5"
+                  >
+                    <ShareIcon />
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={handleFollowToggle}
+                    disabled={isFollowPending}
+                    className={`min-h-10 flex-1 rounded-xl px-5 text-sm font-semibold transition disabled:opacity-50 sm:flex-none ${
+                      profile.isFollowing
+                        ? 'border border-white/15 bg-white/5 text-white hover:bg-white/10'
+                        : 'bg-purple-600 text-white hover:bg-purple-500'
+                    }`}
+                  >
+                    {isFollowPending ? 'Memproses...' : profile.isFollowing ? 'Following' : 'Follow'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleShare}
+                    aria-label="Bagikan profil"
+                    className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-white/10 text-white/75 transition hover:bg-white/5"
+                  >
+                    <ShareIcon />
+                  </button>
+                </>
               )}
             </div>
+
+            {profile.bio && (
+              <p className="whitespace-pre-wrap break-words text-sm leading-6 text-white/75 sm:hidden">
+                {profile.bio}
+              </p>
+            )}
           </div>
 
-          <div className='mt-8 grid grid-cols-2 gap-4 border-t border-gray-100 pt-6 dark:border-gray-800 sm:grid-cols-4'>
-            <div className='text-center'>
-              <p className='text-xl font-bold'>{profile.counts.post}</p>
-              <p className='mt-1 text-sm text-gray-500'>Postingan</p>
-            </div>
-            <div className='text-center'>
-              <p className='text-xl font-bold'>{profile.counts.followers}</p>
-              <p className='mt-1 text-sm text-gray-500'>Followers</p>
-            </div>
-            <div className='text-center'>
-              <p className='text-xl font-bold'>{profile.counts.following}</p>
-              <p className='mt-1 text-sm text-gray-500'>Following</p>
-            </div>
-            <div className='text-center'>
-              <p className='text-xl font-bold'>{profile.counts.likes}</p>
-              <p className='mt-1 text-sm text-gray-500'>Likes</p>
-            </div>
+          {(followMutation.isError || unfollowMutation.isError) && (
+            <p role="alert" className="mt-3 text-sm text-red-400">
+              Gagal memperbarui status Follow. Silakan coba lagi.
+            </p>
+          )}
+
+          <div className="mt-5 grid grid-cols-4 border-t border-white/10 pt-4 sm:mt-6 sm:pt-5">
+            {[
+              { label: 'Post', value: profile.counts.post },
+              { label: 'Followers', value: profile.counts.followers },
+              { label: 'Following', value: profile.counts.following },
+              { label: 'Likes', value: profile.counts.likes },
+            ].map((item, index) => (
+              <div key={item.label} className={`px-1 text-center ${index > 0 ? 'border-l border-white/10' : ''}`}>
+                <p className="text-lg font-bold tabular-nums sm:text-xl">{item.value}</p>
+                <p className="mt-1 text-[11px] text-white/50 sm:text-sm">{item.label}</p>
+              </div>
+            ))}
           </div>
         </section>
 
-        <section className='space-y-4'>
-          <div className='flex items-center justify-between'>
-            <h2 className='text-xl font-bold'>Postingan</h2>
-            {postsQuery.data && (
-              <span className='text-sm text-gray-500'>
-                {postsQuery.data.data.pagination.total} postingan
-              </span>
+        <section>
+          <div className="grid grid-cols-2 border-b border-white/10">
+            <button
+              type="button"
+              onClick={() => setActiveTab('gallery')}
+              aria-pressed={activeTab === 'gallery'}
+              className={`flex h-12 items-center justify-center gap-2 border-b-2 text-sm transition ${
+                activeTab === 'gallery'
+                  ? 'border-white font-semibold text-white'
+                  : 'border-transparent text-white/50 hover:text-white/75'
+              }`}
+            >
+              <GalleryIcon />
+              Gallery
+            </button>
+
+            {profile.isMe ? (
+              <button
+                type="button"
+                onClick={() => setActiveTab('saved')}
+                aria-pressed={activeTab === 'saved'}
+                className={`flex h-12 items-center justify-center gap-2 border-b-2 text-sm transition ${
+                  activeTab === 'saved'
+                    ? 'border-white font-semibold text-white'
+                    : 'border-transparent text-white/50 hover:text-white/75'
+                }`}
+              >
+                <BookmarkIcon />
+                Saved
+              </button>
+            ) : (
+              <div
+                aria-hidden="true"
+                className="border-b-2 border-transparent"
+              />
             )}
           </div>
 
-          {postsQuery.isPending && (
-            <div className='rounded-xl border border-gray-200 bg-white p-6 text-sm text-gray-500 dark:border-gray-800 dark:bg-gray-900'>
-              Memuat postingan...
+          {isContentPending && (
+            <div className="py-12 text-center text-sm text-white/50">
+              Memuat {activeTab === 'gallery' ? 'postingan' : 'postingan tersimpan'}...
             </div>
           )}
 
-          {postsQuery.isError && (
-            <div className='rounded-xl border border-red-200 bg-white p-6 dark:border-red-900 dark:bg-gray-900'>
-              <p className='text-sm text-red-600'>
-                Gagal memuat postingan pengguna.
+          {isContentError && (
+            <div className="py-10 text-center">
+              <p className="text-sm text-red-400">
+                Gagal memuat {activeTab === 'gallery' ? 'postingan' : 'postingan tersimpan'}.
               </p>
               <button
-                type='button'
-                onClick={() => postsQuery.refetch()}
-                className='mt-3 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800'
+                type="button"
+                onClick={() => activeTab === 'gallery' ? postsQuery.refetch() : savedQuery.refetch()}
+                className="mt-3 rounded-xl border border-white/15 px-4 py-2 text-sm hover:bg-white/5"
               >
                 Coba lagi
               </button>
             </div>
           )}
 
-          {postsQuery.isSuccess && posts.length === 0 && (
-            <div className='rounded-xl border border-gray-200 bg-white p-8 text-center dark:border-gray-800 dark:bg-gray-900'>
-              <p className='font-medium'>Belum ada postingan</p>
-              <p className='mt-1 text-sm text-gray-500'>
-                Postingan pengguna ini akan muncul di sini.
+          {!isContentPending && !isContentError && !hasContent && (
+            <div className="px-4 py-16 text-center sm:py-20">
+              <div className="mx-auto flex size-16 items-center justify-center rounded-2xl bg-purple-500/10 text-purple-300">
+                <GalleryIcon />
+              </div>
+              <h3 className="mt-5 text-xl font-bold sm:text-2xl">
+                {activeTab === 'gallery' && profile.isMe
+                  ? 'Your story starts here'
+                  : activeTab === 'saved'
+                    ? 'No saved posts yet'
+                    : 'Belum ada postingan'}
+              </h3>
+              <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-white/50">
+                {activeTab === 'gallery' && profile.isMe
+                  ? 'Share your first post and let the world see your moments, passions, and memories. Make this space truly yours.'
+                  : activeTab === 'saved'
+                    ? 'Postingan yang kamu simpan akan muncul di sini.'
+                    : 'Postingan pengguna ini akan muncul di sini.'}
               </p>
+              {activeTab === 'gallery' && profile.isMe && (
+                <Link
+                  href="/create-post"
+                  className="mt-6 inline-flex min-h-11 items-center justify-center rounded-xl bg-purple-600 px-5 text-sm font-semibold text-white transition hover:bg-purple-500"
+                >
+                  Upload My First Post
+                </Link>
+              )}
             </div>
           )}
 
-          {postsQuery.isSuccess && posts.length > 0 && (
-            <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
-              {posts.map((post) => (
-                <article
-                  key={post.id}
-                  className='overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900'
-                >
-                  {post.imageUrl ? (
-                    <div className='relative aspect-square bg-gray-100 dark:bg-gray-800'>
-                      <Image
-                        src={post.imageUrl}
-                        alt={`Gambar postingan ${profile.username}`}
-                        fill
-                        unoptimized
-                        className='object-cover'
-                        sizes='(max-width: 640px) 100vw, 50vw'
-                      />
-                    </div>
-                  ) : (
-                    <div className='flex aspect-square items-center justify-center bg-gray-100 text-sm text-gray-500 dark:bg-gray-800'>
-                      Tidak ada gambar
-                    </div>
-                  )}
-
-                  <div className='space-y-3 p-4'>
-                    <time
-                      dateTime={post.createdAt}
-                      className='block text-xs text-gray-500 dark:text-gray-400'
-                    >
-                      {formatPostDate(post.createdAt)}
-                    </time>
-
-                    <p className='whitespace-pre-wrap break-words text-sm leading-6'>
-                      {post.caption}
-                    </p>
-
-                    <div className='flex items-center gap-4 border-t border-gray-100 pt-3 text-sm text-gray-500 dark:border-gray-800 dark:text-gray-400'>
-                      <span aria-label={`${post.likeCount} likes`}>
-                        ♥ {post.likeCount} Likes
-                      </span>
-                      <span>☰ {post.commentCount} Komentar</span>
-                    </div>
-                  </div>
-                </article>
-              ))}
+          {!isContentPending && !isContentError && hasContent && (
+            <div className="grid grid-cols-3 gap-1.5 pt-3 sm:gap-2">
+              {activeTab === 'gallery'
+                ? posts.map((post) => (
+                    <PostTile
+                      key={post.id}
+                      post={post}
+                      username={profile.username}
+                      onClick={() => {
+                        setSelectedPost(post);
+                        setSelectedSavedPostId(null);
+                      }}
+                    />
+                  ))
+                : savedPosts.map((post) => (
+                    <PostTile
+                      key={post.id}
+                      post={post}
+                      username={profile.username}
+                      onClick={() => {
+                        setSelectedPost(null);
+                        setSelectedSavedPostId(post.id);
+                      }}
+                    />
+                  ))}
             </div>
           )}
         </section>
+      </div>
+
+      {selectedSavedPostId !== null && postDetailQuery.isPending && (
+        <div
+          role="status"
+          className="fixed inset-0 z-[110] flex items-center justify-center bg-black/75 px-4 text-sm text-white"
+        >
+          Memuat detail postingan...
+        </div>
+      )}
+
+      {selectedSavedPostId !== null && postDetailQuery.isError && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/75 px-4">
+          <div
+            role="alert"
+            className="w-full max-w-sm rounded-2xl border border-white/10 bg-[#211e29] p-6 text-center text-white"
+          >
+            <p className="text-sm text-white/80">
+              Detail postingan tidak dapat dimuat.
+            </p>
+            <button
+              type="button"
+              onClick={() => setSelectedSavedPostId(null)}
+              className="mt-4 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold hover:bg-purple-500"
+            >
+              Tutup
+            </button>
+          </div>
+        </div>
+      )}
+
+      {(selectedPost ||
+        (selectedSavedPostId !== null &&
+          postDetailQuery.data?.id === selectedSavedPostId)) && (
+        <PostCommentsModal
+          post={selectedPost ?? postDetailQuery.data!}
+          onClose={() => {
+            setSelectedPost(null);
+            setSelectedSavedPostId(null);
+          }}
+        />
+      )}
+      <div className="sm:hidden">
+        <ProfileBottomNav active="profile" />
       </div>
     </main>
   );
