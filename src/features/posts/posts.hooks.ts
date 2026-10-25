@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import {
   useInfiniteQuery,
@@ -12,6 +12,7 @@ import {
   deletePost,
   deletePostComment,
   getPostComments,
+  getPostById,
   getFeed,
   likePost,
   unlikePost,
@@ -47,6 +48,16 @@ export function useInfiniteFeedQuery(enabled = true) {
   });
 }
 
+export function usePostDetailQuery(
+  postId: number,
+  enabled = true
+) {
+  return useQuery({
+    queryKey: ['post-detail', postId],
+    queryFn: () => getPostById(postId),
+    enabled: enabled && postId > 0,
+  });
+}
 export function useLikeMutation() {
   const queryClient = useQueryClient();
 

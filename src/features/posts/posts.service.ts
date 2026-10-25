@@ -1,4 +1,5 @@
-﻿import api from '@/lib/api';
+import api from '@/lib/api';
+import type { Post } from './posts.types';
 import type {
   FeedResponse,
   SavedPostsParams,
@@ -25,6 +26,15 @@ export async function getFeed(params: FeedParams = {}): Promise<FeedResponse> {
   return response.data;
 }
 
+export async function getPostById(postId: number): Promise<Post> {
+  const response = await api.get<{
+    success: boolean;
+    message: string;
+    data: Post;
+  }>(`/api/posts/${postId}`);
+
+  return response.data.data;
+}
 export async function likePost(postId: number): Promise<void> {
   await api.post(`/api/posts/${postId}/like`);
 }
