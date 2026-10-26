@@ -1,43 +1,41 @@
-'use client';
+﻿'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { useAppSelector } from '@/lib/redux/hooks';
-import { useLikedPostsQuery } from '@/features/posts/posts.hooks';
+import PostCard from '@/features/posts/components/PostCard';
+import { useInfiniteLikedPostsQuery } from '@/features/posts/posts.hooks';
 
 export default function LikedPostsPage() {
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
 
-  const likedPostsQuery = useLikedPostsQuery(
-    { page: 1, limit: 20 },
-    isAuthenticated
-  );
+  const likedPostsQuery = useInfiniteLikedPostsQuery(isAuthenticated);
+  const likedPosts = likedPostsQuery.data?.pages.flatMap((page) => page.data.posts) ?? [];
+  const totalPosts = likedPostsQuery.data?.pages[0]?.data.pagination.total ?? 0;
 
   return (
-    <main className='min-h-screen bg-gray-50 px-4 py-8 text-gray-900 dark:bg-gray-950 dark:text-white'>
-      <div className='mx-auto max-w-2xl space-y-6'>
-        <header className='flex items-center justify-between gap-4'>
+    <main className='min-h-screen bg-black px-4 pb-28 pt-5 text-white sm:pt-8'>
+      <div className='mx-auto w-full max-w-[600px] space-y-6'>
+        <header className='sticky top-0 z-40 -mx-4 flex items-center justify-between gap-4 border-b border-white/10 bg-black/90 px-4 py-4 backdrop-blur-xl'>
           <div>
-            <h1 className='text-2xl font-bold tracking-tight'>Liked Posts</h1>
-            <p className='mt-1 text-sm text-gray-500 dark:text-gray-400'>
-              Kumpulan postingan yang kamu sukai.
+            <h1 className='text-2xl font-bold tracking-tight'>Liked Posts ({totalPosts})</h1>
+            <p className='mt-1 text-sm text-white/45'>
+              Posts you've liked and want to find again.
             </p>
           </div>
-
           <Link
             href='/'
-            className='rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800'
+            className='cursor-pointer rounded-full border border-white/10 bg-[#111014] px-4 py-2 text-sm font-medium text-white/75 transition hover:bg-white/10 hover:text-white'
           >
-            Kembali
+            Back
           </Link>
         </header>
 
         {!isAuthenticated && (
-          <div className='rounded-xl border border-gray-200 bg-white p-6 text-center dark:border-gray-800 dark:bg-gray-900'>
+          <div className='rounded-2xl border border-white/10 bg-[#111014] p-6 text-center'>
             <p>Login untuk melihat postingan yang kamu sukai.</p>
             <Link
               href='/login'
-              className='mt-4 inline-flex rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-700'
+              className='mt-4 inline-flex cursor-pointer rounded-full bg-purple-600 px-5 py-2 font-semibold text-white transition hover:bg-purple-500'
             >
               Login
             </Link>
@@ -45,89 +43,68 @@ export default function LikedPostsPage() {
         )}
 
         {isAuthenticated && likedPostsQuery.isPending && (
-          <p className='py-8 text-center text-gray-500'>
+          <p className='rounded-2xl border border-white/10 bg-[#111014] py-8 text-center text-white/50'>
             Memuat Liked Posts...
           </p>
         )}
 
         {isAuthenticated && likedPostsQuery.isError && (
-          <div className='rounded-xl border border-red-200 p-4 text-red-600 dark:border-red-900'>
+          <div className='rounded-2xl border border-red-500/20 bg-[#111014] p-5 text-red-400'>
             <p>Gagal memuat Liked Posts.</p>
             <button
               type='button'
               onClick={() => likedPostsQuery.refetch()}
-              className='mt-3 rounded-lg bg-blue-600 px-4 py-2 text-white'
+              className='mt-3 cursor-pointer rounded-full bg-purple-600 px-5 py-2 text-white transition hover:bg-purple-500'
             >
               Coba lagi
             </button>
           </div>
         )}
 
-        {isAuthenticated &&
-          likedPostsQuery.isSuccess &&
-          (likedPostsQuery.data.data.posts.length === 0 ? (
-            <div className='rounded-xl border border-gray-200 bg-white p-8 text-center dark:border-gray-800 dark:bg-gray-900'>
+        {isAuthenticated && likedPostsQuery.isSuccess && (
+          likedPosts.length === 0 ? (
+            <div className='rounded-2xl border border-dashed border-white/15 bg-[#111014] p-8 text-center'>
               <h2 className='font-semibold'>
                 Belum ada postingan yang disukai
               </h2>
-              <p className='mt-2 text-sm text-gray-500'>
+              <p className='mt-2 text-sm text-white/45'>
                 Berikan Like pada postingan di Home Feed untuk menemukannya
                 kembali di sini.
               </p>
               <Link
                 href='/'
-                className='mt-4 inline-flex rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700'
+                className='mt-4 inline-flex cursor-pointer rounded-full bg-purple-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-purple-500'
               >
                 Buka Home Feed
               </Link>
             </div>
           ) : (
             <div className='space-y-5'>
-              {likedPostsQuery.data.data.posts.map((post) => (
-                <article
+              {likedPosts.map((post) => (
+                <PostCard
                   key={post.id}
-                  className='overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900'
-                >
-                  {post.imageUrl && (
-                    <div className='relative aspect-[4/3] w-full bg-gray-100 dark:bg-gray-800'>
-                      <Image
-                        src={post.imageUrl}
-                        alt='Gambar postingan yang disukai'
-                        fill
-                        unoptimized
-                        className='object-contain'
-                        sizes='(max-width: 672px) 100vw, 672px'
-                      />
-                    </div>
-                  )}
-
-                  <div className='space-y-3 p-4'>
-                    <Link
-                      href={`/users/${encodeURIComponent(post.author.username)}`}
-                      className='text-sm font-semibold text-purple-600 hover:underline dark:text-purple-400'
-                    >
-                      {post.author.name} @{post.author.username}
-                    </Link>
-
-                    <p className='whitespace-pre-wrap break-words'>
-                      {post.caption}
-                    </p>
-
-                    <div className='flex items-center justify-between gap-3 text-xs text-gray-500'>
-                      <span>♥ {post.likeCount} Likes</span>
-                      <span>
-                        {new Intl.DateTimeFormat('id-ID', {
-                          dateStyle: 'medium',
-                          timeStyle: 'short',
-                        }).format(new Date(post.createdAt))}
-                      </span>
-                    </div>
-                  </div>
-                </article>
+                  post={post}
+                  metadataLabel='Liked at'
+                />
               ))}
+
+              {likedPostsQuery.hasNextPage && (
+                <div className='flex justify-center pt-2'>
+                  <button
+                    type='button'
+                    onClick={() => likedPostsQuery.fetchNextPage()}
+                    disabled={likedPostsQuery.isFetchingNextPage}
+                    className='cursor-pointer rounded-full border border-white/10 bg-[#17151d] px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50'
+                  >
+                    {likedPostsQuery.isFetchingNextPage ? 'Loading...' : 'Load More'}
+                  </button>
+                </div>
+              )}
             </div>
-          ))}
+          )
+        )}
       </div>
     </main>
   );
 }
+

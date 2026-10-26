@@ -19,6 +19,7 @@ import PostLikesModal from './PostLikesModal';
 
 interface PostCardProps {
   post: Post;
+  metadataLabel?: string;
 }
 
 type IconName = 'heart' | 'message' | 'bookmark' | 'share' | 'more';
@@ -154,7 +155,7 @@ function CaptionText({
     </div>
   );
 }
-export default function PostCard({ post }: PostCardProps) {
+export default function PostCard({ post, metadataLabel }: PostCardProps) {
   const router = useRouter();
   const authorName = post.author.name || post.author.username;
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
@@ -281,7 +282,16 @@ export default function PostCard({ post }: PostCardProps) {
             dateTime={post.createdAt}
             className='mt-0.5 block text-[11px] text-white/35'
           >
-            {formatPostDate(post.createdAt)}
+            {metadataLabel
+              ? `${metadataLabel} · ${new Intl.DateTimeFormat('id-ID', {
+                  day: 'numeric',
+                  month: 'short',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  hourCycle: 'h23',
+                }).format(new Date(post.createdAt))}`
+              : formatPostDate(post.createdAt)}
           </time>
         </div>
 
@@ -457,6 +467,7 @@ export default function PostCard({ post }: PostCardProps) {
     </article>
   );
 }
+
 
 
 

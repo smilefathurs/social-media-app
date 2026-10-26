@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import {
   useInfiniteQuery,
@@ -237,3 +237,29 @@ export function useInfinitePostLikesQuery(
     enabled: enabled && postId > 0,
   });
 }
+export function useInfiniteSavedPostsQuery(enabled = true) {
+  return useInfiniteQuery({
+    queryKey: ['saved-posts-infinite'],
+    initialPageParam: 1,
+    queryFn: ({ pageParam }) => getSavedPosts({ page: pageParam, limit: 20 }),
+    getNextPageParam: (lastPage) => {
+      const { page, totalPages } = lastPage.data.pagination;
+      return page < totalPages ? page + 1 : undefined;
+    },
+    enabled,
+  });
+}
+
+export function useInfiniteLikedPostsQuery(enabled = true) {
+  return useInfiniteQuery({
+    queryKey: ['liked-posts-infinite'],
+    initialPageParam: 1,
+    queryFn: ({ pageParam }) => getLikedPosts({ page: pageParam, limit: 20 }),
+    getNextPageParam: (lastPage) => {
+      const { page, totalPages } = lastPage.data.pagination;
+      return page < totalPages ? page + 1 : undefined;
+    },
+    enabled,
+  });
+}
+
