@@ -1,3 +1,9 @@
+> **Project Status: Beta — In Development**
+>
+> Sociality22 is a social media web application currently under active development. Features may be incomplete, and the user interface may change.
+>
+> This repository is shared for development feedback. It is not yet a final production release.
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
