@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import Link from 'next/link';
 import { useAppSelector } from '@/lib/redux/hooks';
@@ -32,7 +32,7 @@ export default function SavedPostsPage() {
 
         {!isAuthenticated && (
           <div className='rounded-2xl border border-white/10 bg-[#111014] p-6 text-center'>
-            <p>Login untuk melihat postingan yang kamu simpan.</p>
+            <p>Log in to view your saved posts.</p>
             <Link
               href='/login'
               className='mt-4 inline-flex cursor-pointer rounded-full bg-purple-600 px-5 py-2 font-semibold text-white transition hover:bg-purple-500'
@@ -44,19 +44,19 @@ export default function SavedPostsPage() {
 
         {isAuthenticated && savedPostsQuery.isPending && (
           <p className='rounded-2xl border border-white/10 bg-[#111014] py-8 text-center text-white/50'>
-            Memuat Saved Posts...
+            Loading saved posts...
           </p>
         )}
 
         {isAuthenticated && savedPostsQuery.isError && (
           <div className='rounded-2xl border border-red-500/20 bg-[#111014] p-5 text-red-400'>
-            <p>Gagal memuat Saved Posts.</p>
+            <p>Failed to load saved posts.</p>
             <button
               type='button'
               onClick={() => savedPostsQuery.refetch()}
               className='mt-3 cursor-pointer rounded-full bg-purple-600 px-5 py-2 text-white transition hover:bg-purple-500'
             >
-              Coba lagi
+              Try Again
             </button>
           </div>
         )}
@@ -64,15 +64,15 @@ export default function SavedPostsPage() {
         {isAuthenticated && savedPostsQuery.isSuccess && (
           savedPosts.length === 0 ? (
             <div className='rounded-2xl border border-dashed border-white/15 bg-[#111014] p-8 text-center'>
-              <h2 className='font-semibold'>Belum ada postingan tersimpan</h2>
+              <h2 className='font-semibold'>No Saved Posts Yet</h2>
               <p className='mt-2 text-sm text-white/45'>
-                Simpan postingan dari Home Feed untuk melihatnya di sini.
+                Save posts from your Home Feed to find them here.
               </p>
               <Link
                 href='/'
                 className='mt-4 inline-flex cursor-pointer rounded-full bg-purple-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-purple-500'
               >
-                Buka Home Feed
+                Explore Home Feed
               </Link>
             </div>
           ) : (

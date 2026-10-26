@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
@@ -132,7 +132,7 @@ function Avatar({
     return (
       <Image
         src={src}
-        alt={`Avatar ${name}`}
+        alt={`Profile picture of ${name}`}
         width={size === 'large' ? 112 : 36}
         height={size === 'large' ? 112 : 36}
         unoptimized
@@ -164,7 +164,7 @@ function PostTile({
       {post.imageUrl ? (
         <Image
           src={post.imageUrl}
-          alt={post.caption || `Postingan ${username}`}
+          alt={post.caption || `Post by ${username}`}
           fill
           unoptimized
           sizes='(max-width: 640px) 33vw, 270px'
@@ -172,7 +172,7 @@ function PostTile({
         />
       ) : (
         <div className='flex h-full items-center justify-center p-3 text-center text-xs text-white/50'>
-          {post.caption || 'Postingan tanpa gambar'}
+          {post.caption || 'Post without an image'}
         </div>
       )}
       {post.caption && (
@@ -183,10 +183,10 @@ function PostTile({
       <button
         type='button'
         onClick={onClick}
-        aria-label={`Buka postingan ${username}: ${post.caption || 'tanpa caption'}`}
+        aria-label={`Open post by ${username}: ${post.caption || 'no caption'}`}
         className='absolute inset-0 z-10 cursor-pointer'
       >
-        <span className='sr-only'>Buka postingan</span>
+        <span className='sr-only'>Open post</span>
       </button>
     </article>
   );
@@ -212,10 +212,8 @@ export default function UserProfilePage() {
       window.history.replaceState(
         window.history.state,
         '',
-        window.location.pathname,
+        window.location.pathname
       );
-
-
     }
   }, []);
 
@@ -270,20 +268,20 @@ export default function UserProfilePage() {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `Profil ${profile?.name || username}`,
+          title: `Profile of ${profile?.name || username}`,
           url,
         });
       } catch {
-        // Pengguna mungkin membatalkan dialog berbagi.
+        // The user may have cancelled the share dialog.
       }
       return;
     }
 
     try {
       await navigator.clipboard.writeText(url);
-      window.alert('Tautan profil berhasil disalin.');
+      window.alert('Profile link copied successfully.');
     } catch {
-      window.alert('Tidak dapat menyalin tautan profil pada browser ini.');
+      window.alert('Unable to copy the profile link in this browser.');
     }
   }
 
@@ -291,7 +289,7 @@ export default function UserProfilePage() {
     return (
       <main className='min-h-screen bg-[#0d0b11] px-4 py-10 text-white'>
         <div className='mx-auto max-w-[812px] text-sm text-white/60'>
-          Memuat profil pengguna...
+          Loading user profile...
         </div>
       </main>
     );
@@ -301,15 +299,15 @@ export default function UserProfilePage() {
     return (
       <main className='min-h-screen bg-[#0d0b11] px-4 py-10 text-white'>
         <div className='mx-auto max-w-[812px] rounded-2xl border border-white/10 bg-[#17151d] p-6'>
-          <h1 className='text-lg font-semibold'>Profil tidak dapat dimuat</h1>
+          <h1 className='text-lg font-semibold'>Unable to Load Profile</h1>
           <p className='mt-2 text-sm text-white/60'>
-            Pengguna mungkin tidak ditemukan atau terjadi masalah koneksi.
+            The user may not exist, or there may be a connection issue.
           </p>
           <Link
             href='/'
             className='mt-5 inline-flex rounded-xl bg-purple-600 px-4 py-2 text-sm font-semibold hover:bg-purple-500'
           >
-            Kembali ke Home
+            Back to Home
           </Link>
         </div>
       </main>
@@ -346,7 +344,12 @@ export default function UserProfilePage() {
           className='fixed left-3 right-3 top-20 z-[120] flex h-10 items-center gap-2 rounded-lg bg-[#079455] px-3 py-2 text-sm font-semibold tracking-[-0.02em] text-white shadow-xl shadow-black/20 sm:left-auto sm:right-[max(1.5rem,calc((100vw-812px)/2))] sm:top-24 sm:w-[291px]'
         >
           <span className='flex size-5 shrink-0 items-center justify-center rounded-full bg-white/15'>
-            <svg viewBox='0 0 24 24' fill='none' className='size-3.5' aria-hidden='true'>
+            <svg
+              viewBox='0 0 24 24'
+              fill='none'
+              className='size-3.5'
+              aria-hidden='true'
+            >
               <path
                 d='m5 12 4 4L19 6'
                 stroke='currentColor'
@@ -356,11 +359,11 @@ export default function UserProfilePage() {
               />
             </svg>
           </span>
-          <span className='flex-1'>Profile Success Update</span>
+          <span className='flex-1'>Profile Updated Successfully</span>
           <button
             type='button'
             onClick={() => setShowProfileSuccess(false)}
-            aria-label='Tutup notifikasi'
+            aria-label='Close notification'
             className='ml-auto flex size-5 shrink-0 cursor-pointer items-center justify-center rounded-md text-white/90 transition hover:bg-white/15 hover:text-white'
           >
             <svg
@@ -385,7 +388,7 @@ export default function UserProfilePage() {
       <header className='sticky top-0 z-30 flex h-14 items-center justify-between border-b border-white/[0.06] bg-[#0d0b11]/95 px-4 backdrop-blur-xl sm:hidden'>
         <Link
           href='/'
-          aria-label='Kembali'
+          aria-label='Back'
           className='flex size-10 items-center justify-center text-white/85'
         >
           <BackIcon />
@@ -436,7 +439,7 @@ export default function UserProfilePage() {
                   <button
                     type='button'
                     onClick={handleShare}
-                    aria-label='Bagikan profil'
+                    aria-label='Share profile'
                     className='flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-white/10 text-white/75 transition hover:bg-white/5'
                   >
                     <img
@@ -460,7 +463,7 @@ export default function UserProfilePage() {
                     }`}
                   >
                     {isFollowPending
-                      ? 'Memproses...'
+                      ? 'Processing...'
                       : profile.isFollowing
                         ? 'Following'
                         : 'Follow'}
@@ -468,7 +471,7 @@ export default function UserProfilePage() {
                   <button
                     type='button'
                     onClick={handleShare}
-                    aria-label='Bagikan profil'
+                    aria-label='Share profile'
                     className='flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-white/10 text-white/75 transition hover:bg-white/5'
                   >
                     <img
@@ -491,7 +494,7 @@ export default function UserProfilePage() {
 
           {(followMutation.isError || unfollowMutation.isError) && (
             <p role='alert' className='mt-3 text-sm text-red-400'>
-              Gagal memperbarui status Follow. Silakan coba lagi.
+              Failed to update follow status. Please try again.
             </p>
           )}
 
@@ -687,7 +690,7 @@ export default function UserProfilePage() {
           role='status'
           className='fixed inset-0 z-[110] flex items-center justify-center bg-black/75 px-4 text-sm text-white'
         >
-          Memuat detail postingan...
+          Loading post details...
         </div>
       )}
 
@@ -698,14 +701,14 @@ export default function UserProfilePage() {
             className='w-full max-w-sm rounded-2xl border border-white/10 bg-[#211e29] p-6 text-center text-white'
           >
             <p className='text-sm text-white/80'>
-              Detail postingan tidak dapat dimuat.
+              Unable to load post details.
             </p>
             <button
               type='button'
               onClick={() => setSelectedSavedPostId(null)}
               className='mt-4 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold hover:bg-purple-500'
             >
-              Tutup
+              Close
             </button>
           </div>
         </div>
@@ -728,9 +731,3 @@ export default function UserProfilePage() {
     </main>
   );
 }
-
-
-
-
-
-

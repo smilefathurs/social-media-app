@@ -57,13 +57,13 @@ export default function EditProfilePageForm({ profile }: Props) {
     if (!file) return;
 
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-      setFormError('Pilih gambar JPG, PNG, atau WEBP.');
+      setFormError('Select a JPG, PNG, or WEBP image.');
       event.target.value = '';
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      setFormError('Ukuran foto maksimal 5 MB.');
+      setFormError('Image size must not exceed 5 MB.');
       event.target.value = '';
       return;
     }
@@ -83,15 +83,15 @@ export default function EditProfilePageForm({ profile }: Props) {
     const cleanUsername = username.trim();
     const cleanPhone = phone.trim();
 
-    if (!cleanName) nextErrors.name = 'Nama wajib diisi.';
+    if (!cleanName) nextErrors.name = 'Name is required.';
     if (!cleanUsername) {
-      nextErrors.username = 'Username wajib diisi.';
+      nextErrors.username = 'Username is required.';
     } else if (!/^[a-zA-Z0-9_.]+$/.test(cleanUsername)) {
-      nextErrors.username = 'Gunakan huruf, angka, titik, atau underscore.';
+      nextErrors.username = 'Use letters, numbers, periods, or underscores.';
     }
 
     if (cleanUsername.length > 30) {
-      nextErrors.username = 'Username maksimal 30 karakter.';
+      nextErrors.username = 'Username must not exceed 30 characters.';
     }
 
     setErrors(nextErrors);
@@ -131,7 +131,7 @@ export default function EditProfilePageForm({ profile }: Props) {
   }
 
   function getMutationError() {
-    if (!mutation.error) return 'Gagal memperbarui profil. Silakan coba lagi.';
+    if (!mutation.error) return 'Failed to update profile. Please try again.';
 
     if (axios.isAxiosError(mutation.error)) {
       const data = mutation.error.response?.data as
@@ -143,12 +143,12 @@ export default function EditProfilePageForm({ profile }: Props) {
         data?.error ??
         data?.data?.message ??
         (mutation.error.response?.status === 409
-          ? 'Username sudah digunakan.'
-          : 'Gagal memperbarui profil. Periksa data dan koneksi Anda.')
+          ? 'Username is already taken.'
+          : 'Failed to update profile. Check your information and connection.')
       );
     }
 
-    return 'Gagal memperbarui profil. Silakan coba lagi.';
+    return 'Failed to update profile. Please try again.';
   }
 
   const currentAvatar = previewUrl || profile.avatarUrl;
@@ -164,7 +164,7 @@ export default function EditProfilePageForm({ profile }: Props) {
           {currentAvatar ? (
             <Image
               src={currentAvatar}
-              alt='Foto profil'
+              alt='Profile picture'
               fill
               unoptimized
               sizes='160px'
@@ -191,10 +191,10 @@ export default function EditProfilePageForm({ profile }: Props) {
           accept='image/jpeg,image/png,image/webp'
           onChange={handleAvatarChange}
           className='hidden'
-          aria-label='Pilih foto profil'
+          aria-label='Select profile picture'
         />
         <p className='mt-2 text-center text-xs text-white/40 sm:text-left'>
-          JPG, PNG, atau WEBP · Maks. 5 MB
+          JPG, PNG, or WEBP · Max. 5 MB
         </p>
       </section>
 

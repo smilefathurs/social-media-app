@@ -108,7 +108,7 @@ export default function UserSearch({ onClose }: UserSearchProps) {
           value={searchInput}
           onChange={(event) => setSearchInput(event.target.value)}
           placeholder='Search'
-          aria-label='Cari nama atau username'
+          aria-label='Search by name or username'
           autoComplete='off'
           autoFocus={mobile}
           className={`min-w-0 flex-1 appearance-none bg-transparent text-white outline-none placeholder:text-white/45 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden ${
@@ -120,7 +120,7 @@ export default function UserSearch({ onClose }: UserSearchProps) {
           <button
             type='button'
             onClick={clearSearch}
-            aria-label='Hapus pencarian'
+            aria-label='Clear search'
             className='shrink-0 cursor-pointer text-white/50 transition hover:text-white'
           >
             <ClearIcon />
@@ -261,7 +261,7 @@ export default function UserSearch({ onClose }: UserSearchProps) {
           <button
             type='button'
             onClick={onClose}
-            aria-label='Tutup pencarian'
+            aria-label='Close search'
             className='shrink-0 cursor-pointer text-white transition hover:text-purple-300'
           >
             <CloseIcon />

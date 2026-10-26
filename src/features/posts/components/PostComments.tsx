@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, type FormEvent } from "react";
 import {
@@ -43,15 +43,15 @@ export default function PostComments({ postId }: PostCommentsProps) {
 
   return (
     <section className="border-t border-gray-100 px-4 py-4 dark:border-gray-800">
-      <h3 className="mb-3 text-sm font-semibold">Komentar</h3>
+      <h3 className="mb-3 text-sm font-semibold">Comments</h3>
 
       <form onSubmit={handleSubmit} className="mb-4 flex gap-2">
         <input
           type="text"
           value={text}
           onChange={(event) => setText(event.target.value)}
-          placeholder="Tulis komentar..."
-          aria-label="Tulis komentar"
+          placeholder="Write a comment..."
+          aria-label="Write a comment"
           maxLength={1000}
           className="min-w-0 flex-1 rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm outline-none focus:border-blue-500 dark:border-gray-700"
         />
@@ -60,29 +60,29 @@ export default function PostComments({ postId }: PostCommentsProps) {
           disabled={!text.trim() || addMutation.isPending}
           className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {addMutation.isPending ? "Mengirim..." : "Kirim"}
+          {addMutation.isPending ? "Sending..." : "Send"}
         </button>
       </form>
 
       {addMutation.isError && (
         <p role="alert" className="mb-3 text-sm text-red-600">
-          Komentar gagal dikirim. Silakan coba lagi.
+          Failed to send comment. Please try again.
         </p>
       )}
 
       {commentsQuery.isLoading && (
-        <p className="text-sm text-gray-500">Memuat komentar...</p>
+        <p className="text-sm text-gray-500">Loading comments...</p>
       )}
 
       {commentsQuery.isError && (
         <p role="alert" className="text-sm text-red-600">
-          Komentar gagal dimuat.
+          Failed to load comments.
           <button
             type="button"
             onClick={() => commentsQuery.refetch()}
             className="ml-2 underline"
           >
-            Coba lagi
+            Try Again
           </button>
         </p>
       )}
@@ -91,7 +91,7 @@ export default function PostComments({ postId }: PostCommentsProps) {
         !commentsQuery.isError &&
         comments.length === 0 && (
           <p className="text-sm text-gray-500">
-            Belum ada komentar. Jadilah yang pertama berkomentar!
+            No comments yet. Be the first to comment!
           </p>
         )}
 
@@ -107,7 +107,7 @@ export default function PostComments({ postId }: PostCommentsProps) {
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
                 <p className="text-sm font-semibold">
-                  {comment.author?.name || comment.author?.username || "Pengguna"}
+                  {comment.author?.name || comment.author?.username || "User"}
                 </p>
                 <time className="text-xs text-gray-500" dateTime={comment.createdAt}>
                   {formatCommentDate(comment.createdAt)}
@@ -122,13 +122,13 @@ export default function PostComments({ postId }: PostCommentsProps) {
                 type="button"
                 disabled={deleteMutation.isPending}
                 onClick={() => {
-                  if (window.confirm("Hapus komentar ini?")) {
+                  if (window.confirm("Delete this comment?")) {
                     deleteMutation.mutate(comment.id);
                   }
                 }}
                 className="mt-1 text-xs text-gray-500 underline hover:text-red-600 disabled:opacity-50"
               >
-                Hapus
+                Delete
               </button>
             </div>
           </article>
@@ -137,7 +137,7 @@ export default function PostComments({ postId }: PostCommentsProps) {
 
       {deleteMutation.isError && (
         <p role="alert" className="mt-3 text-sm text-red-600">
-          Komentar tidak dapat dihapus. Pastikan kamu pemilik komentar atau postingan.
+          Unable to delete comment. Make sure you own the comment or the post.
         </p>
       )}
     </section>

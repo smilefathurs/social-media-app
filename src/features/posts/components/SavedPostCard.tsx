@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import PostCard from './PostCard';
 import { usePostDetailQuery } from '../posts.hooks';
@@ -21,14 +21,14 @@ export default function SavedPostCard({ post }: { post: SavedPost }) {
     return (
       <div className="rounded-2xl border border-white/10 bg-[#111014] p-5">
         <p className="text-sm text-white/60">
-          Gagal memuat detail postingan ini.
+          Failed to load this post's details.
         </p>
         <button
           type="button"
           onClick={() => detailQuery.refetch()}
           className="mt-3 cursor-pointer rounded-full bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-500"
         >
-          Coba lagi
+          Try Again
         </button>
       </div>
     );

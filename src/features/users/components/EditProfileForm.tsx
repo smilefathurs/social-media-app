@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
@@ -78,7 +78,7 @@ export default function EditProfileForm({ profile }: EditProfileFormProps) {
 
     if (!ALLOWED_TYPES.includes(file.type)) {
       event.target.value = '';
-      setValidationError('Pilih gambar JPG, PNG, atau WEBP.');
+      setValidationError('Select a JPG, PNG, or WEBP image.');
       return;
     }
 
@@ -104,13 +104,13 @@ export default function EditProfileForm({ profile }: EditProfileFormProps) {
     const trimmedBio = bio.trim();
 
     if (!trimmedName || !trimmedUsername) {
-      setValidationError('Nama dan username wajib diisi.');
+      setValidationError('Name and username are required.');
       return;
     }
 
     if (!/^[a-zA-Z0-9_.]+$/.test(trimmedUsername)) {
       setValidationError(
-        'Username hanya boleh berisi huruf, angka, titik, dan underscore.',
+        'Username may only contain letters, numbers, periods, and underscores.',
       );
       return;
     }
@@ -156,7 +156,7 @@ export default function EditProfileForm({ profile }: EditProfileFormProps) {
     if (validationError) return validationError;
 
     if (!mutation.error) {
-      return 'Gagal memperbarui profil. Silakan coba lagi.';
+      return 'Failed to update profile. Please try again.';
     }
 
     if (axios.isAxiosError(mutation.error)) {
@@ -180,17 +180,17 @@ export default function EditProfileForm({ profile }: EditProfileFormProps) {
       if (apiMessage) return apiMessage;
 
       if (mutation.error.response?.status === 400) {
-        return 'Data tidak valid atau username sudah digunakan. Periksa kembali username Anda.';
+        return 'Invalid information or username already taken. Please check your username.';
       }
 
       if (mutation.error.response?.status === 409) {
-        return 'Username sudah digunakan. Silakan pilih username lain.';
+        return 'Username is already taken. Please choose another.';
       }
 
-      return 'Gagal memperbarui profil. Periksa koneksi dan coba lagi.';
+      return 'Failed to update profile. Check your connection and try again.';
     }
 
-    return 'Gagal memperbarui profil. Silakan coba lagi.';
+    return 'Failed to update profile. Please try again.';
   }
 
   return (
@@ -204,18 +204,18 @@ export default function EditProfileForm({ profile }: EditProfileFormProps) {
           }}
           className="rounded-lg border border-blue-600 px-4 py-2 text-sm font-semibold text-blue-600 transition hover:bg-blue-50 dark:hover:bg-blue-950"
         >
-          Edit Profil
+          Edit Profile
         </button>
       ) : (
         <form
           onSubmit={handleSubmit}
           className="mt-4 space-y-4 rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-950"
         >
-          <h2 className="text-lg font-semibold">Edit Profil</h2>
+          <h2 className="text-lg font-semibold">Edit Profile</h2>
 
           <div>
             <label htmlFor="edit-profile-name" className="mb-1 block text-sm font-medium">
-              Nama
+              Name
             </label>
             <input
               id="edit-profile-name"
@@ -248,7 +248,7 @@ export default function EditProfileForm({ profile }: EditProfileFormProps) {
 
           <div>
             <label htmlFor="edit-profile-phone" className="mb-1 block text-sm font-medium">
-              Nomor telepon
+              Phone Number
             </label>
             <input
               id="edit-profile-phone"
@@ -301,7 +301,7 @@ export default function EditProfileForm({ profile }: EditProfileFormProps) {
                 </p>
                 <Image
                   src={previewUrl || profile.avatarUrl!}
-                  alt="Preview avatar profil"
+                  alt="Profile picture preview"
                   width={96}
                   height={96}
                   unoptimized
@@ -323,7 +323,7 @@ export default function EditProfileForm({ profile }: EditProfileFormProps) {
               disabled={mutation.isPending}
               className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {mutation.isPending ? 'Menyimpan...' : 'Simpan Perubahan'}
+              {mutation.isPending ? 'Saving...' : 'Save Changes'}
             </button>
             <button
               type="button"
@@ -334,7 +334,7 @@ export default function EditProfileForm({ profile }: EditProfileFormProps) {
               }}
               className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold hover:bg-gray-100 disabled:opacity-50 dark:border-gray-700 dark:hover:bg-gray-800"
             >
-              Batal
+              Cancel
             </button>
           </div>
         </form>

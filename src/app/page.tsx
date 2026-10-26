@@ -183,28 +183,28 @@ export default function Home() {
 
       {/* Timeline */}
       <div className='mx-auto w-full max-w-[648px] px-4 pt-5 sm:px-6 sm:pt-8'>
-        <section aria-label='Timeline postingan' className='space-y-5'>
+        <section aria-label='Post Feed' className='space-y-5'>
           {isAuthenticated && feedQuery.isPending && (
             <div className='rounded-2xl border border-white/10 bg-[#111014] p-8 text-center'>
               <div className='mx-auto size-7 animate-spin rounded-full border-2 border-white/10 border-t-purple-500' />
-              <p className='mt-4 text-sm text-white/50'>Memuat feed...</p>
+              <p className='mt-4 text-sm text-white/50'>Loading feed...</p>
             </div>
           )}
 
           {isAuthenticated && feedQuery.isError && (
             <div className='rounded-2xl border border-red-500/20 bg-[#111014] p-5'>
-              <p className='font-semibold text-red-400'>Feed gagal dimuat.</p>
+              <p className='font-semibold text-red-400'>Failed to load feed.</p>
               <p className='mt-2 break-words text-sm text-white/50'>
                 {feedQuery.error instanceof Error
                   ? feedQuery.error.message
-                  : 'Terjadi kesalahan.'}
+                  : 'Something went wrong.'}
               </p>
               <button
                 type='button'
                 onClick={() => feedQuery.refetch()}
                 className='mt-4 rounded-full bg-purple-600 px-5 py-2 text-sm font-semibold transition hover:bg-purple-500'
               >
-                Coba lagi
+                Try Again
               </button>
             </div>
           )}
@@ -243,11 +243,11 @@ export default function Home() {
                   disabled={feedQuery.isFetchingNextPage}
                   className='rounded-full bg-purple-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-purple-500 disabled:cursor-not-allowed disabled:opacity-50'
                 >
-                  {feedQuery.isFetchingNextPage ? 'Memuat...' : 'Load More'}
+                  {feedQuery.isFetchingNextPage ? 'Loading...' : 'Load More'}
                 </button>
               ) : (
                 <p className='text-sm text-white/40'>
-                  Semua postingan sudah ditampilkan.
+                  You've reached the end of the feed.
                 </p>
               )}
             </div>
@@ -257,7 +257,7 @@ export default function Home() {
             <div className='rounded-2xl border border-white/10 bg-[#111014] p-8 text-center'>
               <div className='mx-auto size-7 animate-spin rounded-full border-2 border-white/10 border-t-purple-500' />
               <p className='mt-4 text-sm text-white/50'>
-                Memuat postingan publik...
+                Loading public posts...
               </p>
             </div>
           )}
@@ -265,14 +265,14 @@ export default function Home() {
           {!isAuthenticated && guestFeedQuery.isError && (
             <div className='rounded-2xl border border-red-500/20 bg-[#111014] p-5'>
               <p className='font-semibold text-red-400'>
-                Postingan publik gagal dimuat.
+                Failed to load public posts.
               </p>
               <button
                 type='button'
                 onClick={() => guestFeedQuery.refetch()}
                 className='mt-4 rounded-full bg-purple-600 px-5 py-2 text-sm font-semibold transition hover:bg-purple-500'
               >
-                Coba lagi
+                Try Again
               </button>
             </div>
           )}
@@ -281,9 +281,9 @@ export default function Home() {
             guestFeedQuery.isSuccess &&
             guestPosts.length === 0 && (
               <div className='rounded-2xl border border-dashed border-white/15 bg-[#111014] px-6 py-12 text-center'>
-                <h2 className='font-semibold'>Belum ada postingan publik</h2>
+                <h2 className='font-semibold'>No Public Posts Yet</h2>
                 <p className='mt-2 text-sm text-white/45'>
-                  Silakan coba lagi nanti.
+                  Please try again later.
                 </p>
               </div>
             )}
@@ -306,8 +306,8 @@ export default function Home() {
                   className='rounded-full bg-purple-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-purple-500 disabled:cursor-not-allowed disabled:opacity-50'
                 >
                   {guestFeedQuery.isFetchingNextPage
-                    ? 'Memuat...'
-                    : 'Muat lebih banyak'}
+                    ? 'Loading...'
+                    : 'Load More'}
                 </button>
               </div>
             )}
@@ -332,7 +332,7 @@ export default function Home() {
           type='button'
           onClick={handleCreatePostNavigation}
           aria-label={
-            isAuthenticated ? 'Buat postingan' : 'Login untuk membuat postingan'
+            isAuthenticated ? 'Create post' : 'Log in to create a post'
           }
           className='flex size-11 cursor-pointer items-center justify-center rounded-full bg-purple-600 text-white shadow-lg shadow-purple-950/40 transition hover:scale-105 hover:bg-purple-500'
         >

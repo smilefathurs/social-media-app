@@ -120,7 +120,7 @@ export default function PostCommentsModal({ post, onClose }: Props) {
   function handleDeletePost() {
     if (user?.id !== post.author.id || deletePostMutation.isPending) return;
 
-    if (!window.confirm('Apakah kamu yakin ingin menghapus postingan ini?')) {
+    if (!window.confirm('Are you sure you want to delete this post?')) {
       return;
     }
 
@@ -316,7 +316,7 @@ export default function PostCommentsModal({ post, onClose }: Props) {
           <div className='relative ml-auto shrink-0'>
             <button
               type='button'
-              aria-label='Menu postingan'
+              aria-label='Post menu'
               aria-haspopup='menu'
               aria-expanded={postMenuOpen}
               onClick={() => setPostMenuOpen((open) => !open)}
@@ -362,7 +362,7 @@ export default function PostCommentsModal({ post, onClose }: Props) {
 
       <div className='px-0 pt-4'>
         <h3 className='text-sm font-semibold text-white'>
-          { /* Header komentar mengikuti bahasa UI */ }
+          { /* Comment header follows the UI language */ }
           Comment
         </h3>
       </div>

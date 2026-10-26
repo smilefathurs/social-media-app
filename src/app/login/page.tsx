@@ -13,7 +13,7 @@ function SocialityLogo() {
   return (
     <Link
       href='/'
-      aria-label='Sociality22 - Kembali ke Timeline'
+      aria-label='Sociality22 - Back to Timeline'
       className='inline-flex items-center justify-center gap-3 rounded-lg transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500'
     >
       <Image
@@ -198,7 +198,7 @@ export default function LoginPage() {
                 type='button'
                 onClick={() => setShowPassword((current) => !current)}
                 aria-label={
-                  showPassword ? 'Sembunyikan password' : 'Tampilkan password'
+                  showPassword ? 'Hide password' : 'Show password'
                 }
                 aria-pressed={showPassword}
                 className='absolute inset-y-0 right-0 flex items-center px-4 text-gray-500 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500'
@@ -217,7 +217,7 @@ export default function LoginPage() {
           {/* API authentication error */}
           {loginMutation.isError && (
             <p role='alert' className='text-sm text-pink-500'>
-              Login gagal. Periksa email dan password, lalu coba lagi.
+              Login failed. Check your email and password, then try again.
             </p>
           )}
 
@@ -225,7 +225,7 @@ export default function LoginPage() {
             loginMutation.isSuccess &&
             !loginMutation.data.success && (
               <p role='alert' className='text-sm text-pink-500'>
-                Login gagal. Silakan periksa kembali kredensial Anda.
+                Login failed. Please check your credentials.
               </p>
             )}
 
@@ -235,7 +235,7 @@ export default function LoginPage() {
             disabled={loginMutation.isPending}
             className='w-full rounded-full bg-violet-600 px-5 py-3.5 font-semibold text-white transition hover:bg-violet-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black disabled:cursor-not-allowed disabled:opacity-60'
           >
-            {loginMutation.isPending ? 'Sedang masuk...' : 'Login'}
+            {loginMutation.isPending ? 'Logging in...' : 'Login'}
           </button>
         </form>
 

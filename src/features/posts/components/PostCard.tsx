@@ -217,9 +217,9 @@ export default function PostCard({ post, metadataLabel }: PostCardProps) {
 
     try {
       await navigator.clipboard.writeText(postUrl.toString());
-      setShareMessage('Tautan disalin!');
+      setShareMessage('Link copied!');
     } catch {
-      setShareMessage('Gagal menyalin tautan.');
+      setShareMessage('Failed to copy link.');
     }
 
     window.setTimeout(() => setShareMessage(''), 2500);
@@ -281,7 +281,7 @@ export default function PostCard({ post, metadataLabel }: PostCardProps) {
 
       </div>
 
-      {/* Gambar postingan */}
+      {/* Post image */}
       {post.imageUrl && !imageFailed && (
         <div className='relative mx-auto w-full max-w-[600px]'>
           {isLikesOpen && (
@@ -300,13 +300,13 @@ export default function PostCard({ post, metadataLabel }: PostCardProps) {
               }
               setIsCommentsOpen(true);
             }}
-            aria-label="Buka postingan dan komentar"
+            aria-label="Open post and comments"
             className="relative block w-full cursor-pointer overflow-hidden rounded-xl bg-black text-left sm:rounded-md"
           >
             <div className="relative aspect-square w-full">
               <Image
                 src={post.imageUrl}
-                alt={`Postingan oleh ${authorName}`}
+                alt={`Post by ${authorName}`}
                 fill
                 unoptimized
                 onLoad={handleImageLoad}
@@ -324,7 +324,7 @@ export default function PostCard({ post, metadataLabel }: PostCardProps) {
         <CaptionText username={post.author.username} caption={post.caption} />
       )}
 
-      {/* Aksi postingan */}
+      {/* Post actions */}
       <div className='mx-auto flex w-full max-w-[600px] items-center gap-4 px-4 pb-3 pt-2 sm:gap-6 sm:px-0 sm:pb-4 sm:pt-4'>
         <div className="inline-flex items-center gap-2">
           <button
@@ -332,13 +332,13 @@ export default function PostCard({ post, metadataLabel }: PostCardProps) {
             onClick={handleLikeToggle}
             disabled={!isAuthenticated || isLikePending}
             aria-pressed={post.likedByMe}
-            aria-label={post.likedByMe ? 'Batalkan suka' : 'Sukai postingan'}
+            aria-label={post.likedByMe ? 'Unlike post' : 'Like post'}
             title={
               isAuthenticated
                 ? post.likedByMe
-                  ? 'Batalkan suka'
-                  : 'Sukai postingan'
-                : 'Login untuk menyukai postingan'
+                  ? 'Unlike post'
+                  : 'Like post'
+                : 'Log in to like this post'
             }
             className={`inline-flex cursor-pointer items-center rounded-lg text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
               post.likedByMe
@@ -351,7 +351,7 @@ export default function PostCard({ post, metadataLabel }: PostCardProps) {
           <button
             type="button"
             onClick={() => setIsLikesOpen(true)}
-            aria-label={`Lihat ${post.likeCount} pengguna yang menyukai postingan`}
+            aria-label={`View ${post.likeCount} users who liked this post`}
             className="cursor-pointer rounded-md text-sm text-white/60 transition-colors hover:text-purple-300"
           >
             {post.likeCount}
@@ -368,7 +368,7 @@ export default function PostCard({ post, metadataLabel }: PostCardProps) {
               ? 'text-purple-300'
               : 'text-white/60 hover:text-purple-300'
           }`}
-          aria-label='Tampilkan komentar'
+          aria-label='Show comments'
         >
           <Icon name='message' className='size-[21px]' />
           <span>{post.commentCount}</span>
@@ -379,8 +379,8 @@ export default function PostCard({ post, metadataLabel }: PostCardProps) {
           type='button'
           onClick={handleShare}
           className='inline-flex cursor-pointer items-center rounded-lg text-white transition-colors hover:text-purple-300'
-          aria-label='Salin tautan postingan'
-          title='Salin tautan postingan'
+          aria-label='Copy post link'
+          title='Copy post link'
         >
           <Icon name='share' className='size-[21px]' />
         </button>
@@ -390,13 +390,13 @@ export default function PostCard({ post, metadataLabel }: PostCardProps) {
           onClick={handleSaveToggle}
           disabled={!isAuthenticated || isSavePending}
           aria-pressed={isSaved}
-          aria-label={isSaved ? 'Hapus dari Saved Posts' : 'Simpan postingan'}
+          aria-label={isSaved ? 'Remove from saved posts' : 'Save post'}
           title={
             isAuthenticated
               ? isSaved
-                ? 'Hapus dari Saved Posts'
-                : 'Simpan postingan'
-              : 'Login untuk menyimpan postingan'
+                ? 'Remove from saved posts'
+                : 'Save post'
+              : 'Log in to save this post'
           }
           className={`ml-auto inline-flex cursor-pointer items-center rounded-lg transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
             isSaved ? 'text-purple-400' : 'text-white/60 hover:text-purple-300'
@@ -417,13 +417,13 @@ export default function PostCard({ post, metadataLabel }: PostCardProps) {
 
       {(likeMutation.isError || unlikeMutation.isError) && (
         <p role='alert' className='px-4 pb-3 text-sm text-red-400 sm:px-5'>
-          Gagal memperbarui Like. Silakan coba lagi.
+          Failed to update like. Please try again.
         </p>
       )}
 
       {(saveMutation.isError || unsaveMutation.isError) && (
         <p role='alert' className='px-4 pb-3 text-sm text-red-400 sm:px-5'>
-          Gagal menyimpan perubahan. Silakan coba lagi.
+          Failed to save changes. Please try again.
         </p>
       )}
 

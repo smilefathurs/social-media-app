@@ -85,7 +85,7 @@ export default function PostLikesModal({
           <button
             type='button'
             onClick={onClose}
-            aria-label='Tutup Likes'
+            aria-label='Close likes'
             className='absolute right-3 top-3 z-20 flex size-9 cursor-pointer items-center justify-center rounded-full text-white/75 transition hover:bg-white/10 hover:text-white'
           >
             <svg
@@ -115,21 +115,21 @@ export default function PostLikesModal({
           <div className='min-h-0 flex-1 space-y-5 overflow-y-auto pr-6 [scrollbar-color:#414651_#0A0D12] [scrollbar-width:thin]'>
             {likesQuery.isPending && (
               <p className='py-8 text-center text-sm text-white/50'>
-                Memuat pengguna...
+                Loading users...
               </p>
             )}
 
             {likesQuery.isError && (
               <div className='py-6 text-center'>
                 <p className='text-sm text-red-400'>
-                  Gagal memuat daftar Likes.
+                  Failed to load likes.
                 </p>
                 <button
                   type='button'
                   onClick={() => likesQuery.refetch()}
                   className='mt-3 text-sm text-purple-300 hover:text-purple-200'
                 >
-                  Coba lagi
+                  Try Again
                 </button>
               </div>
             )}
@@ -138,7 +138,7 @@ export default function PostLikesModal({
               !likesQuery.isError &&
               users.length === 0 && (
                 <p className='py-8 text-center text-sm text-white/50'>
-                  Belum ada yang menyukai postingan ini.
+                  No one has liked this post yet.
                 </p>
               )}
 
@@ -148,7 +148,7 @@ export default function PostLikesModal({
                   href={`/users/${encodeURIComponent(user.username)}`}
                   onClick={onClose}
                   className='shrink-0'
-                  aria-label={`Lihat profil ${user.name || user.username}`}
+                  aria-label={`View profile of ${user.name || user.username}`}
                 >
                   {user.avatarUrl ? (
                     <Image
@@ -205,7 +205,7 @@ export default function PostLikesModal({
                 onClick={() => likesQuery.fetchNextPage()}
                 className='w-full cursor-pointer rounded-lg py-3 text-sm font-medium text-purple-300 hover:bg-white/5 disabled:opacity-50'
               >
-                {likesQuery.isFetchingNextPage ? 'Memuat...' : 'Load more'}
+                {likesQuery.isFetchingNextPage ? 'Loading...' : 'Load more'}
               </button>
             )}
           </div>

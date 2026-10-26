@@ -17,7 +17,7 @@ function SocialityLogo() {
   return (
     <Link
       href='/'
-      aria-label='Sociality22 - Kembali ke Timeline'
+      aria-label='Sociality22 - Back to Timeline'
       className='inline-flex items-center justify-center gap-3 rounded-lg transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500'
     >
       <Image
@@ -100,7 +100,7 @@ export default function RegisterPage() {
       onSuccess: (response) => {
         if (response?.success) {
           setSuccessMessage(
-            response.message || 'Registrasi berhasil. Silakan login.'
+            response.message || 'Registration successful. Please log in.'
           );
           router.push('/login');
         }
@@ -132,7 +132,7 @@ export default function RegisterPage() {
     },
     {
       name: 'phone',
-      label: 'Number Phone',
+      label: 'Phone Number',
       placeholder: 'Enter your phone number',
       type: 'tel',
       autoComplete: 'tel',
@@ -313,14 +313,14 @@ export default function RegisterPage() {
 
           {registerMutation.isError && (
             <p role='alert' className='text-sm text-pink-500'>
-              Registrasi gagal. Periksa data Anda dan coba lagi.
+              Registration failed. Check your information and try again.
             </p>
           )}
 
           {registerMutation.isSuccess && !registerMutation.data?.success && (
             <p role='alert' className='text-sm text-pink-500'>
               {registerMutation.data?.message ||
-                'Registrasi gagal. Silakan periksa kembali data Anda.'}
+                'Registration failed. Please check your information.'}
             </p>
           )}
 

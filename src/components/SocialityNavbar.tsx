@@ -200,7 +200,7 @@ export default function SocialityNavbar({
                 <button
                   type='button'
                   onClick={() => setIsProfileMenuOpen((previous) => !previous)}
-                  aria-label='Buka menu profil'
+                  aria-label='Open profile menu'
                   aria-expanded={isProfileMenuOpen}
                   aria-haspopup='menu'
                   className='flex max-w-52 items-center gap-2 rounded-full border cursor-pointer border-white/1 py-1.5 pl-1.5 pr-3 transition hover:border-purple-400/40 hover:bg-white/[0.04]'
@@ -273,7 +273,7 @@ export default function SocialityNavbar({
                         );
                         window.dispatchEvent(closeEvent);
                       }}
-                      aria-label='Tutup notifikasi'
+                      aria-label='Close notification'
                       className='ml-auto flex size-5 shrink-0 cursor-pointer items-center justify-center rounded-md text-white/90 transition hover:bg-white/15 hover:text-white'
                     >
                       <svg
@@ -364,7 +364,7 @@ export default function SocialityNavbar({
                         <path d='M10 17l5-5-5-5M15 12H3' />
                         <path d='M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6' />
                       </svg>
-                      {logoutMutation.isPending ? 'Sedang keluar...' : 'Logout'}
+                      {logoutMutation.isPending ? 'Logging out...' : 'Logout'}
                     </button>
                   </div>
                 )}
@@ -392,7 +392,7 @@ export default function SocialityNavbar({
             <button
               type='button'
               onClick={() => setIsSearchOpen((previous) => !previous)}
-              aria-label={isSearchOpen ? 'Tutup pencarian' : 'Buka pencarian'}
+              aria-label={isSearchOpen ? 'Close search' : 'Open search'}
               aria-expanded={isSearchOpen}
               className='rounded-lg p-2 text-white/70 transition hover:bg-white/10 hover:text-purple-300'
             >
@@ -403,7 +403,7 @@ export default function SocialityNavbar({
                 <button
                   type='button'
                   onClick={() => setIsProfileMenuOpen((previous) => !previous)}
-                  aria-label='Buka menu profil'
+                  aria-label='Open profile menu'
                   aria-expanded={isProfileMenuOpen}
                   aria-haspopup='menu'
                   className='flex size-9 items-center justify-center rounded-full ring-offset-2 ring-offset-black transition hover:ring-2 hover:ring-purple-500'
@@ -411,7 +411,7 @@ export default function SocialityNavbar({
                   {user.avatarUrl ? (
                     <Image
                       src={user.avatarUrl}
-                      alt='Foto profil'
+                      alt='Profile picture'
                       width={36}
                       height={36}
                       unoptimized
@@ -498,7 +498,7 @@ export default function SocialityNavbar({
                         <path d='M10 17l5-5-5-5M15 12H3' />
                         <path d='M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6' />
                       </svg>
-                      {logoutMutation.isPending ? 'Sedang keluar...' : 'Logout'}
+                      {logoutMutation.isPending ? 'Logging out...' : 'Logout'}
                     </button>
                   </div>
                 )}
@@ -507,7 +507,7 @@ export default function SocialityNavbar({
               <button
                 type='button'
                 onClick={() => setIsMenuOpen((previous) => !previous)}
-                aria-label={isMenuOpen ? 'Tutup menu' : 'Buka menu'}
+                aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
                 aria-expanded={isMenuOpen}
                 className='rounded-lg p-2 text-white/80 transition hover:bg-white/10'
               >
@@ -540,7 +540,7 @@ export default function SocialityNavbar({
           </div>
         </div>
 
-        {/* Menu dropdown mobile */}
+        {/* Mobile dropdown menu */}
         {isMenuOpen && !isAuthenticated && (
           <div className='border-t border-white/10 bg-[#0c0b10] px-4 py-4 sm:hidden'>
             <div className='mx-auto flex max-w-[600px] gap-3'>

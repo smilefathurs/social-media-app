@@ -42,7 +42,7 @@ export default function EditProfilePage() {
   if (!isAuthenticated || !user) {
     return (
       <main className='min-h-screen bg-[#0d0b11] text-white'>
-        <p className='p-6 text-sm text-white/60'>Memuat sesi pengguna...</p>
+        <p className='p-6 text-sm text-white/60'>Loading user session...</p>
       </main>
     );
   }
@@ -51,7 +51,7 @@ export default function EditProfilePage() {
     return (
       <main className='min-h-screen bg-[#0d0b11] px-4 py-10 text-white'>
         <p className='mx-auto max-w-5xl text-sm text-white/60'>
-          Memuat profil...
+          Loading profile...
         </p>
       </main>
     );
@@ -61,22 +61,22 @@ export default function EditProfilePage() {
     return (
       <main className='min-h-screen bg-[#0d0b11] px-4 py-10 text-white'>
         <div className='mx-auto max-w-5xl rounded-2xl border border-white/10 bg-[#17151d] p-6'>
-          <h1 className='text-lg font-semibold'>Profil tidak dapat dimuat</h1>
+          <h1 className='text-lg font-semibold'>Unable to Load Profile</h1>
           <p className='mt-2 text-sm text-white/60'>
-            Silakan periksa koneksi dan sesi login, lalu coba lagi.
+            Please check your connection and login session, then try again.
           </p>
           <button
             type='button'
             onClick={() => profileQuery.refetch()}
             className='mt-4 rounded-xl bg-purple-600 px-4 py-2 text-sm font-semibold hover:bg-purple-500'
           >
-            Coba Lagi
+            Try Again
           </button>
           <Link
             href={`/users/${encodeURIComponent(user.username)}`}
             className='ml-3 inline-flex text-sm text-purple-300 hover:text-purple-200'
           >
-            Kembali ke Profil
+            Back to Profile
           </Link>
         </div>
       </main>
@@ -94,7 +94,7 @@ export default function EditProfilePage() {
       <header className='sticky top-0 z-30 flex h-14 items-center justify-between border-b border-white/[0.06] bg-[#0d0b11]/95 px-4 backdrop-blur-xl sm:hidden'>
         <Link
           href={profileHref}
-          aria-label='Kembali ke profil'
+          aria-label='Back to profile'
           className='flex size-10 items-center justify-center text-white/85'
         >
           <BackIcon />
@@ -122,7 +122,7 @@ export default function EditProfilePage() {
         <div className='mb-8 hidden items-center gap-3 sm:flex'>
           <Link
             href={profileHref}
-            aria-label='Kembali ke profil'
+            aria-label='Back to profile'
             className='flex size-10 items-center justify-center rounded-full text-white/80 transition hover:bg-white/10'
           >
             <BackIcon />

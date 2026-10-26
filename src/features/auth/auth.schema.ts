@@ -1,25 +1,25 @@
 import { z } from 'zod';
 
 export const registerSchema = z.object({
-  name: z.string().trim().min(1, 'Nama wajib diisi'),
-  username: z.string().trim().min(1, 'Username wajib diisi'),
-  email: z.string().trim().email('Format email tidak valid'),
-  phone: z.string().trim().min(1, 'Nomor telepon wajib diisi'),
-  password: z.string().min(1, 'Password wajib diisi'),
+  name: z.string().trim().min(1, 'Name is required'),
+  username: z.string().trim().min(1, 'Username is required'),
+  email: z.string().trim().email('Please enter a valid email address'),
+  phone: z.string().trim().min(1, 'Phone number is required'),
+  password: z.string().min(1, 'Password is required'),
 });
 
 export const registerFormSchema = registerSchema
   .extend({
-    confirmPassword: z.string().min(1, 'Konfirmasi password wajib diisi'),
+    confirmPassword: z.string().min(1, 'Password confirmation is required'),
   })
   .refine((values) => values.password === values.confirmPassword, {
-    message: 'Password dan konfirmasi password tidak sama',
+    message: 'Passwords do not match',
     path: ['confirmPassword'],
   });
 
 export const loginSchema = z.object({
-  email: z.string().trim().email('Format email tidak valid'),
-  password: z.string().min(1, 'Password wajib diisi'),
+  email: z.string().trim().email('Please enter a valid email address'),
+  password: z.string().min(1, 'Password is required'),
 });
 
 export type RegisterFormValues = z.infer<typeof registerSchema>;

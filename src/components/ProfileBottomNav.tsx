@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -98,7 +98,7 @@ export default function ProfileBottomNav({
         type="button"
         onClick={handleCreatePost}
         aria-label={
-          isAuthenticated ? 'Buat postingan' : 'Login untuk membuat postingan'
+          isAuthenticated ? 'Create post' : 'Log in to create a post'
         }
         className="flex size-12 items-center justify-center rounded-full bg-purple-600 text-white shadow-lg shadow-purple-950/40 transition hover:scale-105 hover:bg-purple-500 sm:size-11"
       >
