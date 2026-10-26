@@ -14,6 +14,7 @@ import {
   getPostComments,
   getPostById,
   getFeed,
+  getPublicPosts,
   likePost,
   unlikePost,
   getSavedPosts,
@@ -24,7 +25,6 @@ import {
   type FeedParams,
 } from './posts.service';
 import type { CommentsParams } from './posts.types';
-import { getGuestFeed } from './guest-feed.service';
 
 export function useFeedQuery(params: FeedParams = {}, enabled = true) {
   return useQuery({
@@ -203,14 +203,17 @@ export function useLikedPostsQuery(params: FeedParams = {}, enabled = true) {
   });
 }
 
-export function useGuestFeedQuery(
-  username: string | null,
-  enabled = true
-) {
-  return useQuery({
-    queryKey: ['guest-feed', username],
-    queryFn: () => getGuestFeed(username!),
-    enabled: enabled && Boolean(username),
+export function useInfiniteGuestFeedQuery(enabled = true) {
+  return useInfiniteQuery({
+    queryKey: ['guest-feed', 'public'],
+    initialPageParam: 1,
+    queryFn: ({ pageParam }) =>
+      getPublicPosts({ page: pageParam, limit: 20 }),
+    getNextPageParam: (lastPage) => {
+      const { page, totalPages } = lastPage.data.pagination;
+      return page < totalPages ? page + 1 : undefined;
+    },
+    enabled,
     staleTime: 60 * 1000,
   });
 }

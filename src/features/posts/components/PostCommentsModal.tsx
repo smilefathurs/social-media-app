@@ -1,5 +1,6 @@
 'use client';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { createPortal } from 'react-dom';
 import type { Post } from '../posts.types';
@@ -100,6 +101,7 @@ export default function PostCommentsModal({ post, onClose }: Props) {
   const [postMenuOpen, setPostMenuOpen] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
+  const router = useRouter();
   const user = useAppSelector((state) => state.auth.user);
   const commentsQuery = usePostCommentsQuery(post.id, { page: 1, limit: 30 });
   const addMutation = useAddPostCommentMutation(post.id);
@@ -109,7 +111,7 @@ export default function PostCommentsModal({ post, onClose }: Props) {
   const unlikeMutation = useUnlikeMutation();
   const saveMutation = useSavePostMutation();
   const unsaveMutation = useUnsavePostMutation();
-  const savedQuery = useSavedPostsQuery({ page: 1, limit: 20 });
+  const savedQuery = useSavedPostsQuery({ page: 1, limit: 20 }, Boolean(user));
 
   const savedPosts = savedQuery.data?.data.posts ?? [];
   const isSaved = savedPosts.some((item) => item.id === post.id);
@@ -146,8 +148,15 @@ export default function PostCommentsModal({ post, onClose }: Props) {
     };
   }, [onClose]);
 
+  function requireAuth() {
+    if (user) return true;
+    router.push('/login');
+    return false;
+  }
+
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!requireAuth()) return;
     const trimmed = text.trim();
     if (!trimmed || addMutation.isPending) return;
 
@@ -181,6 +190,7 @@ export default function PostCommentsModal({ post, onClose }: Props) {
   }
 
   function toggleLike() {
+    if (!requireAuth()) return;
     if (localLiked) {
       setLocalLiked(false);
       setLocalLikeCount((count) => Math.max(0, count - 1));
@@ -223,72 +233,56 @@ export default function PostCommentsModal({ post, onClose }: Props) {
         onClick={toggleLike}
         aria-label={localLiked ? 'Unlike post' : 'Like post'}
         className={
-          localLiked ? 'text-purple-400' : 'text-white hover:text-purple-300'
+          localLiked ? 'cursor-pointer text-purple-400 hover:text-purple-300' : 'cursor-pointer text-white hover:text-purple-300'
         }
       >
-        <svg
-          viewBox='0 0 24 24'
-          className='size-6'
-          fill={localLiked ? 'currentColor' : 'none'}
-          stroke='currentColor'
-          strokeWidth='1.8'
-        >
-          <path d='M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z' />
-        </svg>
+        <img
+  src={localLiked ? '/icons/like-active.svg' : '/icons/like-normal.svg'}
+  alt=''
+  aria-hidden='true'
+  className='size-6 shrink-0 object-contain'
+/>
       </button>
       <span className='text-sm text-white/65'>{localLikeCount}</span>
-      <span className='text-white/80'>
-        <svg
-          viewBox='0 0 24 24'
-          className='size-6'
-          fill='none'
-          stroke='currentColor'
-          strokeWidth='1.8'
-        >
-          <path d='M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z' />
-        </svg>
+      <span className='cursor-pointer text-white/80 hover:text-purple-300'>
+        <img
+  src='/icons/comment.svg'
+  alt=''
+  aria-hidden='true'
+  className='size-6 shrink-0 object-contain'
+/>
       </span>
       <button
         type='button'
         onClick={handleShare}
         aria-label='Copy post link'
-        className='text-white/80 hover:text-purple-300'
+        className='cursor-pointer text-white/80 hover:text-purple-300'
       >
-        <svg
-          viewBox='0 0 24 24'
-          className='size-6'
-          fill='none'
-          stroke='currentColor'
-          strokeWidth='1.8'
-        >
-          <circle cx='18' cy='5' r='3' />
-          <circle cx='6' cy='12' r='3' />
-          <circle cx='18' cy='19' r='3' />
-          <path d='m8.7 10.7 6.6-4.4m-6.6 7 6.6 4.4' />
-        </svg>
+        <img
+  src='/icons/share.svg'
+  alt=''
+  aria-hidden='true'
+  className='size-6 shrink-0 object-contain'
+/>
       </button>
       <button
         type='button'
         onClick={() => {
+          if (!requireAuth()) return;
           if (isSaved) unsaveMutation.mutate(post.id);
           else saveMutation.mutate(post.id);
         }}
         aria-label={isSaved ? 'Unsave post' : 'Save post'}
         className={
-          isSaved
-            ? 'text-purple-400'
-            : 'ml-auto text-white/80 hover:text-purple-300'
+          isSaved ? 'ml-auto cursor-pointer text-purple-400 hover:text-purple-300' : 'ml-auto cursor-pointer text-white/80 hover:text-purple-300'
         }
       >
-        <svg
-          viewBox='0 0 24 24'
-          className='size-6'
-          fill={isSaved ? 'currentColor' : 'none'}
-          stroke='currentColor'
-          strokeWidth='1.8'
-        >
-          <path d='M6 4.8A1.8 1.8 0 0 1 7.8 3h8.4A1.8 1.8 0 0 1 18 4.8V21l-6-4-6 4V4.8Z' />
-        </svg>
+        <img
+  src={isSaved ? '/icons/save-active.svg' : '/icons/save-normal.svg'}
+  alt=''
+  aria-hidden='true'
+  className='size-6 shrink-0 object-contain'
+/>
       </button>
     </div>
   );
@@ -296,24 +290,27 @@ export default function PostCommentsModal({ post, onClose }: Props) {
   const commentList = (
     <div className='min-h-0 flex-1 overflow-y-auto px-4 [scrollbar-color:#414651_#0A0D12] [scrollbar-width:thin] sm:px-5'>
       <div className='flex gap-3 border-b border-white/[0.07] py-4'>
-        <Avatar src={post.author.avatarUrl} name={authorName} />
+        <button
+          type='button'
+          onClick={() => router.push(`/users/${encodeURIComponent(post.author.username)}`)}
+          aria-label={`Open ${authorName}'s profile`}
+          className='shrink-0 cursor-pointer rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400'
+        >
+          <Avatar src={post.author.avatarUrl} name={authorName} />
+        </button>
         <div className='min-w-0 flex-1'>
-          <div className='flex flex-wrap items-baseline gap-x-2'>
-            <span className='text-sm font-semibold text-white'>
+          <div className='flex flex-col items-start gap-1'>
+            <button
+              type='button'
+              onClick={() => router.push(`/users/${encodeURIComponent(post.author.username)}`)}
+              className='cursor-pointer text-sm font-semibold text-white hover:underline'
+            >
               {authorName}
-            </span>
-            <span className='text-xs text-white/40'>
-              @{post.author.username}
-            </span>
+            </button>
             <span className='text-xs text-white/40'>
               {relativeTime(post.createdAt)}
             </span>
           </div>
-          {post.caption && (
-            <p className='mt-1 whitespace-pre-wrap break-words text-sm leading-6 text-white/85'>
-              {post.caption}
-            </p>
-          )}
         </div>
         {user?.id === post.author.id && (
           <div className='relative ml-auto shrink-0'>
@@ -357,6 +354,19 @@ export default function PostCommentsModal({ post, onClose }: Props) {
         )}
       </div>
 
+      {post.caption && (
+        <p className='border-b border-white/[0.07] px-0 pb-4 text-sm leading-6 text-white/85 whitespace-pre-wrap break-words'>
+          {post.caption}
+        </p>
+      )}
+
+      <div className='px-0 pt-4'>
+        <h3 className='text-sm font-semibold text-white'>
+          { /* Header komentar mengikuti bahasa UI */ }
+          Comment
+        </h3>
+      </div>
+
       {commentsQuery.isLoading && (
         <p className='py-8 text-center text-sm text-white/50'>
           Loading comments...
@@ -397,25 +407,28 @@ export default function PostCommentsModal({ post, onClose }: Props) {
         return (
           <article
             key={comment.id}
-            className='flex gap-3 border-b border-white/[0.07] py-4 last:border-b-0'
+            className='flex flex-col gap-2 border-b border-white/[0.07] py-4 last:border-b-0'
           >
-            <Avatar
-              src={comment.author.avatarUrl}
-              name={comment.author.name || comment.author.username}
-            />
-            <div className='min-w-0 flex-1'>
-              <div className='flex flex-wrap items-baseline gap-x-2'>
-                <span className='text-sm font-semibold text-white'>
-                  {comment.author.name || comment.author.username}
-                </span>
-                <span className='text-xs text-white/40'>
-                  {relativeTime(comment.createdAt)}
-                </span>
+            <div className='flex items-start gap-3'>
+              <Avatar
+                src={comment.author.avatarUrl}
+                name={comment.author.name || comment.author.username}
+              />
+              <div className='min-w-0 flex-1'>
+                <div className='flex flex-col items-start gap-1'>
+                  <span className='text-sm font-semibold text-white'>
+                    {comment.author.name || comment.author.username}
+                  </span>
+                  <span className='text-xs text-white/40'>
+                    {relativeTime(comment.createdAt)}
+                  </span>
+                </div>
               </div>
-              <p className='mt-1 whitespace-pre-wrap break-words text-sm leading-6 text-white/85'>
-                {comment.text}
-              </p>
-              {canDelete && (
+            </div>
+            <p className='whitespace-pre-wrap break-words text-sm leading-6 text-white/85'>
+              {comment.text}
+            </p>
+            {canDelete && (
                 <button
                   type='button'
                   disabled={deleteMutation.isPending}
@@ -429,7 +442,6 @@ export default function PostCommentsModal({ post, onClose }: Props) {
                   Delete
                 </button>
               )}
-            </div>
           </article>
         );
       })}
@@ -517,7 +529,7 @@ export default function PostCommentsModal({ post, onClose }: Props) {
             type='button'
             onClick={onClose}
             aria-label='Close comments'
-            className='absolute -right-1 -top-12 z-20 flex size-10 items-center justify-center rounded-full text-3xl text-white hover:bg-white/10'
+            className='absolute -right-1 -top-12 z-20 flex size-10 cursor-pointer items-center justify-center rounded-full text-3xl text-white hover:bg-white/10'
           >
             {'\u00D7'}
           </button>
@@ -584,7 +596,7 @@ export default function PostCommentsModal({ post, onClose }: Props) {
           type='button'
           onClick={onClose}
           aria-label='Close post'
-          className='absolute right-4 top-5 z-40 flex size-10 items-center justify-center rounded-full bg-black/60 text-3xl text-white'
+          className='absolute right-4 top-5 z-40 flex size-10 cursor-pointer items-center justify-center rounded-full bg-black/60 text-3xl text-white hover:bg-black/80'
         >
           {'\u00D7'}
         </button>
@@ -596,17 +608,14 @@ export default function PostCommentsModal({ post, onClose }: Props) {
                 type='button'
                 onClick={toggleLike}
                 aria-label={localLiked ? 'Unlike post' : 'Like post'}
-                className={localLiked ? 'text-purple-400' : 'text-white'}
+                className={localLiked ? 'cursor-pointer text-purple-400 hover:text-purple-300' : 'cursor-pointer text-white hover:text-purple-300'}
               >
-                <svg
-                  viewBox='0 0 24 24'
-                  className='size-7'
-                  fill={localLiked ? 'currentColor' : 'none'}
-                  stroke='currentColor'
-                  strokeWidth='1.8'
-                >
-                  <path d='M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z' />
-                </svg>
+                <img
+  src={localLiked ? '/icons/like-active.svg' : '/icons/like-normal.svg'}
+  alt=''
+  aria-hidden='true'
+  className='size-7 shrink-0 object-contain'
+/>
               </button>
 
               <span className='text-sm text-white'>{localLikeCount}</span>
@@ -615,17 +624,14 @@ export default function PostCommentsModal({ post, onClose }: Props) {
                 type='button'
                 onClick={() => setMobileCommentsOpen((open) => !open)}
                 aria-label='Open comments'
-                className='flex items-center gap-2 text-white'
+                className='flex cursor-pointer items-center gap-2 text-white hover:text-purple-300'
               >
-                <svg
-                  viewBox='0 0 24 24'
-                  className='size-7'
-                  fill='none'
-                  stroke='currentColor'
-                  strokeWidth='1.8'
-                >
-                  <path d='M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z' />
-                </svg>
+                <img
+  src='/icons/comment.svg'
+  alt=''
+  aria-hidden='true'
+  className='size-7 shrink-0 object-contain'
+/>
                 <span className='text-sm'>Comments</span>
               </button>
             </div>
@@ -633,21 +639,19 @@ export default function PostCommentsModal({ post, onClose }: Props) {
             <button
               type='button'
               onClick={() => {
+                if (!requireAuth()) return;
                 if (isSaved) unsaveMutation.mutate(post.id);
                 else saveMutation.mutate(post.id);
               }}
               aria-label={isSaved ? 'Unsave post' : 'Save post'}
-              className={isSaved ? 'text-purple-400' : 'text-white'}
+              className={isSaved ? 'cursor-pointer text-purple-400 hover:text-purple-300' : 'cursor-pointer text-white hover:text-purple-300'}
             >
-              <svg
-                viewBox='0 0 24 24'
-                className='size-7'
-                fill={isSaved ? 'currentColor' : 'none'}
-                stroke='currentColor'
-                strokeWidth='1.8'
-              >
-                <path d='M6 4.8A1.8 1.8 0 0 1 7.8 3h8.4A1.8 1.8 0 0 1 18 4.8V21l-6-4-6 4V4.8Z' />
-              </svg>
+              <img
+  src={isSaved ? '/icons/save-active.svg' : '/icons/save-normal.svg'}
+  alt=''
+  aria-hidden='true'
+  className='size-7 shrink-0 object-contain'
+/>
             </button>
           </div>
         )}
@@ -665,15 +669,12 @@ export default function PostCommentsModal({ post, onClose }: Props) {
                 aria-label='Toggle comments'
                 className='relative z-50 flex items-center gap-2 rounded-full px-2 py-2 text-white hover:bg-white/10'
               >
-                <svg
-                  viewBox='0 0 24 24'
-                  className='size-6'
-                  fill='none'
-                  stroke='currentColor'
-                  strokeWidth='1.8'
-                >
-                  <path d='M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z' />
-                </svg>
+                <img
+  src='/icons/comment.svg'
+  alt=''
+  aria-hidden='true'
+  className='size-6 shrink-0 object-contain'
+/>
                 <span className='text-sm'>Comments</span>
               </button>
 

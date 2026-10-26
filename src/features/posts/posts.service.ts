@@ -2,6 +2,7 @@ import api from '@/lib/api';
 import type { Post } from './posts.types';
 import type {
   FeedResponse,
+  PublicPostsResponse,
   SavedPostsParams,
   SavedPostsResponse,
   LikedPostsParams,
@@ -26,6 +27,19 @@ export async function getFeed(params: FeedParams = {}): Promise<FeedResponse> {
   return response.data;
 }
 
+
+export async function getPublicPosts(
+  params: FeedParams = {}
+): Promise<PublicPostsResponse> {
+  const response = await api.get<PublicPostsResponse>('/api/posts', {
+    params: {
+      page: params.page ?? 1,
+      limit: params.limit ?? 20,
+    },
+  });
+
+  return response.data;
+}
 export async function getPostById(postId: number): Promise<Post> {
   const response = await api.get<{
     success: boolean;

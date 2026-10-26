@@ -3,14 +3,13 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useInfiniteFeedQuery, useGuestFeedQuery } from '@/features/posts/posts.hooks';
+import { useInfiniteFeedQuery, useInfiniteGuestFeedQuery } from '@/features/posts/posts.hooks';
 import { useAppSelector } from '@/lib/redux/hooks';
 import PostCard from '@/features/posts/components/PostCard';
 import UserSearch from '@/features/users/components/UserSearch';
 import { useLogoutMutation } from '@/features/auth/auth-logout.hooks';
 import { useRouter } from 'next/navigation';
 import SocialityNavbar from '@/components/SocialityNavbar';
-import { loadLastLoggedInUsername } from '@/features/auth/auth-storage';
 
 function HomeIcon({ active = false }: { active?: boolean }) {
   return (
@@ -82,11 +81,6 @@ function SearchIcon() {
 
 export default function Home() {
   const [showPostSuccess, setShowPostSuccess] = useState(false);
-  const [lastLoggedInUsername, setLastLoggedInUsername] = useState<string | null>(null);
-
-  useEffect(() => {
-    setLastLoggedInUsername(loadLastLoggedInUsername());
-  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -131,7 +125,9 @@ export default function Home() {
 
   const logoutMutation = useLogoutMutation();
   const feedQuery = useInfiniteFeedQuery(isAuthenticated);
-  const guestFeedQuery = useGuestFeedQuery(lastLoggedInUsername, !isAuthenticated);
+  const guestFeedQuery = useInfiniteGuestFeedQuery(!isAuthenticated);
+  const guestPosts =
+    guestFeedQuery.data?.pages.flatMap((page) => page.data.posts) ?? [];
   const router = useRouter();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -252,21 +248,7 @@ export default function Home() {
             </div>
           )}
 
-          {!isAuthenticated && !lastLoggedInUsername && (
-            <div className='rounded-2xl border border-dashed border-white/15 bg-[#111014] px-6 py-12 text-center'>
-              <h2 className='font-semibold'>Timeline belum tersedia</h2>
-              <p className='mt-2 text-sm leading-6 text-white/45'>
-                Login terlebih dahulu agar postingan dari akun terakhir yang login dapat ditampilkan saat menjadi guest.
-              </p>
-              <Link
-                href='/login'
-                className='mt-5 inline-flex rounded-full bg-purple-600 px-5 py-2 text-sm font-semibold transition hover:bg-purple-500'
-              >
-                Login
-              </Link>
-            </div>
-          )}
-          {!isAuthenticated && lastLoggedInUsername && guestFeedQuery.isPending && (
+          {!isAuthenticated && guestFeedQuery.isPending && (
             <div className='rounded-2xl border border-white/10 bg-[#111014] p-8 text-center'>
               <div className='mx-auto size-7 animate-spin rounded-full border-2 border-white/10 border-t-purple-500' />
               <p className='mt-4 text-sm text-white/50'>
@@ -275,7 +257,7 @@ export default function Home() {
             </div>
           )}
 
-          {!isAuthenticated && lastLoggedInUsername && guestFeedQuery.isError && (
+          {!isAuthenticated && guestFeedQuery.isError && (
             <div className='rounded-2xl border border-red-500/20 bg-[#111014] p-5'>
               <p className='font-semibold text-red-400'>
                 Postingan publik gagal dimuat.
@@ -292,7 +274,7 @@ export default function Home() {
 
           {!isAuthenticated &&
             guestFeedQuery.isSuccess &&
-            guestFeedQuery.data.length === 0 && (
+            guestPosts.length === 0 && (
               <div className='rounded-2xl border border-dashed border-white/15 bg-[#111014] px-6 py-12 text-center'>
                 <h2 className='font-semibold'>Belum ada postingan publik</h2>
                 <p className='mt-2 text-sm text-white/45'>
@@ -303,20 +285,27 @@ export default function Home() {
 
           {!isAuthenticated &&
             guestFeedQuery.isSuccess &&
-            guestFeedQuery.data.slice(0, 5).map((post) => (
+            guestPosts.map((post) => (
               <PostCard key={post.id} post={post} />
             ))}
-          {!isAuthenticated && guestFeedQuery.isSuccess && guestFeedQuery.data.length > 0 && (
-            <div className='flex justify-center py-6'>
-              <button
-                type='button'
-                onClick={() => router.push('/login')}
-                className='rounded-full bg-purple-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-purple-500'
-              >
-                Load More
-              </button>
-            </div>
-          )}
+
+          {!isAuthenticated &&
+            guestFeedQuery.isSuccess &&
+            guestPosts.length > 0 &&
+            guestFeedQuery.hasNextPage && (
+              <div className='flex justify-center py-6'>
+                <button
+                  type='button'
+                  onClick={() => guestFeedQuery.fetchNextPage()}
+                  disabled={guestFeedQuery.isFetchingNextPage}
+                  className='rounded-full bg-purple-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-purple-500 disabled:cursor-not-allowed disabled:opacity-50'
+                >
+                  {guestFeedQuery.isFetchingNextPage
+                    ? 'Memuat...'
+                    : 'Muat lebih banyak'}
+                </button>
+              </div>
+            )}
         </section>
       </div>
 
