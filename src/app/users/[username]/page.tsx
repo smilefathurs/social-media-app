@@ -1,6 +1,6 @@
-'use client';
+﻿'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -9,7 +9,6 @@ import {
   useFollowUserMutation,
   useUnfollowUserMutation,
 } from '@/features/users/users.hooks';
-import EditProfileForm from '@/features/users/components/EditProfileForm';
 import {
   useUserLikedPostsQuery,
   useUserPostsQuery,
@@ -202,6 +201,33 @@ export default function UserProfilePage() {
   const [selectedSavedPostId, setSelectedSavedPostId] = useState<number | null>(
     null
   );
+  const [showProfileSuccess, setShowProfileSuccess] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+
+    if (params.get('profileUpdated') === '1') {
+      setShowProfileSuccess(true);
+
+      window.history.replaceState(
+        window.history.state,
+        '',
+        window.location.pathname,
+      );
+
+
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!showProfileSuccess) return;
+
+    const timeoutId = window.setTimeout(() => {
+      setShowProfileSuccess(false);
+    }, 3000);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [showProfileSuccess]);
 
   const profileQuery = useUserProfileQuery(username);
   const postsQuery = useUserPostsQuery(username);
@@ -313,6 +339,45 @@ export default function UserProfilePage() {
 
   return (
     <main className='min-h-screen overflow-x-hidden bg-[#0d0b11] pb-28 text-white sm:pb-12'>
+      {showProfileSuccess && (
+        <div
+          role='status'
+          aria-live='polite'
+          className='fixed left-3 right-3 top-20 z-[120] flex h-10 items-center gap-2 rounded-lg bg-[#079455] px-3 py-2 text-sm font-semibold tracking-[-0.02em] text-white shadow-xl shadow-black/20 sm:left-auto sm:right-[max(1.5rem,calc((100vw-812px)/2))] sm:top-24 sm:w-[291px]'
+        >
+          <span className='flex size-5 shrink-0 items-center justify-center rounded-full bg-white/15'>
+            <svg viewBox='0 0 24 24' fill='none' className='size-3.5' aria-hidden='true'>
+              <path
+                d='m5 12 4 4L19 6'
+                stroke='currentColor'
+                strokeWidth='2'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+              />
+            </svg>
+          </span>
+          <span className='flex-1'>Profile Success Update</span>
+          <button
+            type='button'
+            onClick={() => setShowProfileSuccess(false)}
+            aria-label='Tutup notifikasi'
+            className='ml-auto flex size-5 shrink-0 cursor-pointer items-center justify-center rounded-md text-white/90 transition hover:bg-white/15 hover:text-white'
+          >
+            <svg
+              viewBox='0 0 24 24'
+              fill='none'
+              stroke='currentColor'
+              strokeWidth='2'
+              strokeLinecap='round'
+              className='size-4'
+              aria-hidden='true'
+            >
+              <path d='M18 6 6 18M6 6l12 12' />
+            </svg>
+          </button>
+        </div>
+      )}
+
       <div className='hidden sm:block'>
         <SocialityNavbar />
       </div>
@@ -361,15 +426,25 @@ export default function UserProfilePage() {
               {profile.isMe ? (
                 <>
                   <div className='min-w-0 flex-1 sm:flex-none'>
-                    <EditProfileForm profile={profile} />
+                    <Link
+                      href='/profile/edit'
+                      className='flex min-h-10 cursor-pointer items-center justify-center rounded-xl px-5 text-sm font-semibold text-white transition-colors hover:bg-purple-600'
+                    >
+                      Edit Profile
+                    </Link>
                   </div>
                   <button
                     type='button'
                     onClick={handleShare}
                     aria-label='Bagikan profil'
-                    className='flex size-10 shrink-0 items-center justify-center rounded-xl border border-white/10 text-white/75 transition hover:bg-white/5'
+                    className='flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-white/10 text-white/75 transition hover:bg-white/5'
                   >
-                    <ShareIcon />
+                    <img
+                      src='/icons/share.svg'
+                      alt=''
+                      aria-hidden='true'
+                      className='size-[21px] shrink-0 object-contain'
+                    />
                   </button>
                 </>
               ) : (
@@ -378,7 +453,7 @@ export default function UserProfilePage() {
                     type='button'
                     onClick={handleFollowToggle}
                     disabled={isFollowPending}
-                    className={`min-h-10 flex-1 rounded-xl px-5 text-sm font-semibold transition disabled:opacity-50 sm:flex-none ${
+                    className={`min-h-10 flex-1 cursor-pointer rounded-xl px-5 text-sm font-semibold transition disabled:opacity-50 sm:flex-none ${
                       profile.isFollowing
                         ? 'border border-white/15 bg-white/5 text-white hover:bg-white/10'
                         : 'bg-purple-600 text-white hover:bg-purple-500'
@@ -394,9 +469,14 @@ export default function UserProfilePage() {
                     type='button'
                     onClick={handleShare}
                     aria-label='Bagikan profil'
-                    className='flex size-10 shrink-0 items-center justify-center rounded-xl border border-white/10 text-white/75 transition hover:bg-white/5'
+                    className='flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-white/10 text-white/75 transition hover:bg-white/5'
                   >
-                    <ShareIcon />
+                    <img
+                      src='/icons/share.svg'
+                      alt=''
+                      aria-hidden='true'
+                      className='size-[21px] shrink-0 object-contain'
+                    />
                   </button>
                 </>
               )}
@@ -422,7 +502,7 @@ export default function UserProfilePage() {
               { label: 'Following', value: profile.counts.following },
               {
                 label: 'Likes',
-                value: likedQuery.data?.data.pagination.total ?? '—',
+                value: likedQuery.data?.data.pagination.total ?? 'â€”',
               },
             ].map((item, index) => (
               <div
@@ -648,3 +728,9 @@ export default function UserProfilePage() {
     </main>
   );
 }
+
+
+
+
+
+
