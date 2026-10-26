@@ -35,7 +35,7 @@ export default function CreatePostPage() {
         <section className='w-full max-w-md rounded-2xl border border-white/10 bg-[#111016] p-6 text-center'>
           <h1 className='text-xl font-bold'>Login diperlukan</h1>
           <p className='mt-2 text-sm leading-6 text-white/55'>
-            Silakan login untuk membuat postingan di Sociality.
+            Silakan login untuk membuat postingan di Sociality22.
           </p>
           <Link
             href='/login'
@@ -70,7 +70,7 @@ export default function CreatePostPage() {
             Bagikan ceritamu
           </h1>
           <p className='mt-2 text-sm leading-6 text-white/50'>
-            Abadikan momen dan bagikan dengan komunitas Sociality.
+            Abadikan momen dan bagikan dengan komunitas Sociality22.
           </p>
         </div>
 

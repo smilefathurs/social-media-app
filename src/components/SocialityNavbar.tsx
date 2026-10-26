@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
@@ -173,7 +173,7 @@ export default function SocialityNavbar({
               }
             }}
             className='relative z-50 flex shrink-0 items-center gap-2.5'
-            aria-label='Sociality Home'
+            aria-label='Sociality22 Home'
           >
             <Image
               src='/images/sociality-logo.png'
@@ -184,7 +184,7 @@ export default function SocialityNavbar({
               className='size-10 shrink-0 object-contain'
             />
             <span className='text-xl font-bold tracking-tight text-white'>
-              Sociality
+              Sociality22
             </span>
           </Link>
 

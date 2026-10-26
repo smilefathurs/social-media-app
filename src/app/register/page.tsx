@@ -15,19 +15,23 @@ import { useRegisterMutation } from '@/features/auth/auth.hooks';
 
 function SocialityLogo() {
   return (
-    <div className='flex items-center justify-center gap-3'>
+    <Link
+      href='/'
+      aria-label='Sociality22 - Kembali ke Timeline'
+      className='inline-flex items-center justify-center gap-3 rounded-lg transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500'
+    >
       <Image
         src='/images/sociality-logo.png'
-        alt='Sociality Logo'
+        alt='Sociality22 Logo'
         width={40}
         height={40}
         priority
         className='h-10 w-10 object-contain'
       />
       <span className='text-2xl font-bold tracking-tight text-[#FDFDFD]'>
-        Sociality
+        Sociality22
       </span>
-    </div>
+    </Link>
   );
 }
 
@@ -181,7 +185,7 @@ export default function RegisterPage() {
             Create Account
           </h1>
           <p className='mt-2 text-sm text-gray-400'>
-            Join Sociality and connect with others
+            Join Sociality22 and connect with others
           </p>
         </header>
 

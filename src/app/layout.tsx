@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Sociality',
-  description: 'Connect, share, and engage with your community on Sociality.',
+  title: 'Sociality22',
+  description: 'Connect, share, and engage with your community on Sociality22.',
 };
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {
