@@ -1,11 +1,10 @@
-﻿'use client';
+'use client';
 
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
-  useDeletePostMutation,
   useLikeMutation,
   useUnlikeMutation,
   useSavePostMutation,
@@ -173,16 +172,13 @@ export default function PostCard({ post, metadataLabel }: PostCardProps) {
     }
   }
 
-  const user = useAppSelector((state) => state.auth.user);
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
 
-  const deleteMutation = useDeletePostMutation();
   const likeMutation = useLikeMutation();
   const unlikeMutation = useUnlikeMutation();
   const saveMutation = useSavePostMutation();
   const unsaveMutation = useUnsavePostMutation();
 
-  const isOwner = user?.id === post.author.id;
 
   const isLikePending = likeMutation.isPending || unlikeMutation.isPending;
 
@@ -194,18 +190,6 @@ export default function PostCard({ post, metadataLabel }: PostCardProps) {
     savedPostsQuery.data?.data?.posts?.some(
       (savedPost) => savedPost.id === post.id
     ) ?? false;
-
-  function handleDeletePost() {
-    if (!isOwner || deleteMutation.isPending) return;
-
-    const confirmed = window.confirm(
-      'Apakah kamu yakin ingin menghapus postingan ini?'
-    );
-
-    if (confirmed) {
-      deleteMutation.mutate(post.id);
-    }
-  }
 
   function handleLikeToggle() {
     if (!isAuthenticated || isLikePending) return;
@@ -295,16 +279,6 @@ export default function PostCard({ post, metadataLabel }: PostCardProps) {
           </time>
         </div>
 
-        {isOwner && (
-          <button
-            type='button'
-            onClick={handleDeletePost}
-            disabled={deleteMutation.isPending}
-            className='rounded-lg px-3 py-2 cursor-pointer text-xs font-medium text-red-400 transition-colors hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-50'
-          >
-            {deleteMutation.isPending ? 'Menghapus...' : 'Hapus'}
-          </button>
-        )}
       </div>
 
       {/* Gambar postingan */}
@@ -453,11 +427,6 @@ export default function PostCard({ post, metadataLabel }: PostCardProps) {
         </p>
       )}
 
-      {deleteMutation.isError && (
-        <p role='alert' className='px-4 pb-3 text-sm text-red-400 sm:px-5'>
-          Gagal menghapus postingan. Silakan coba lagi.
-        </p>
-      )}
       {isCommentsOpen && (
         <PostCommentsModal
           post={post}

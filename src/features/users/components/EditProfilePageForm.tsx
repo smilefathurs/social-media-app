@@ -181,7 +181,7 @@ export default function EditProfilePageForm({ profile }: Props) {
           type='button'
           onClick={() => fileInputRef.current?.click()}
           disabled={mutation.isPending}
-          className='mt-4 rounded-xl border border-purple-400/40 px-5 py-2.5 text-sm font-semibold text-purple-300 transition hover:bg-purple-500/10 disabled:opacity-50'
+          className='mt-4 cursor-pointer rounded-xl border border-purple-400/40 px-5 py-2.5 text-sm font-semibold text-purple-300 transition hover:bg-purple-500/10 disabled:cursor-not-allowed disabled:opacity-50'
         >
           Change Photo
         </button>
@@ -278,7 +278,7 @@ export default function EditProfilePageForm({ profile }: Props) {
         <button
           type='submit'
           disabled={mutation.isPending}
-          className='w-full rounded-xl bg-purple-600 px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-purple-500 disabled:cursor-not-allowed disabled:opacity-50'
+          className='w-full cursor-pointer rounded-xl bg-purple-600 px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-purple-500 disabled:cursor-not-allowed disabled:opacity-50'
         >
           {mutation.isPending ? 'Saving Changes...' : 'Save Changes'}
         </button>

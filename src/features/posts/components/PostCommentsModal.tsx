@@ -320,7 +320,7 @@ export default function PostCommentsModal({ post, onClose }: Props) {
               aria-haspopup='menu'
               aria-expanded={postMenuOpen}
               onClick={() => setPostMenuOpen((open) => !open)}
-              className='flex size-9 items-center justify-center rounded-full text-white/60 transition hover:bg-white/10 hover:text-white'
+              className='flex size-9 cursor-pointer items-center justify-center rounded-full text-white/60 transition hover:bg-white/10 hover:text-white'
             >
               <svg
                 viewBox='0 0 24 24'
@@ -344,7 +344,7 @@ export default function PostCommentsModal({ post, onClose }: Props) {
                   role='menuitem'
                   disabled={deletePostMutation.isPending}
                   onClick={handleDeletePost}
-                  className='flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm text-red-300 hover:bg-red-500/10 disabled:opacity-50'
+                  className='flex w-full cursor-pointer items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm text-red-300 hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-50'
                 >
                   Delete Post
                 </button>
