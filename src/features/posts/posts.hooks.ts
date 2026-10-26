@@ -36,14 +36,26 @@ export function useFeedQuery(params: FeedParams = {}, enabled = true) {
 
 export function useInfiniteFeedQuery(enabled = true) {
   return useInfiniteQuery({
-    queryKey: ['feed', 'infinite'],
+    queryKey: ['feed', 'infinite', 'public-posts'],
     initialPageParam: 1,
-    queryFn: ({ pageParam }) =>
-      getFeed({ page: pageParam, limit: 20 }),
-    getNextPageParam: (lastPage, _allPages, lastPageParam) =>
-      lastPage.data.items.length === 20
-        ? lastPageParam + 1
-        : undefined,
+    queryFn: async ({ pageParam }) => {
+      const response = await getPublicPosts({
+        page: pageParam,
+        limit: 20,
+      });
+
+      return {
+        ...response,
+        data: {
+          ...response.data,
+          items: response.data.posts,
+        },
+      };
+    },
+    getNextPageParam: (lastPage) => {
+      const { page, totalPages } = lastPage.data.pagination;
+      return page < totalPages ? page + 1 : undefined;
+    },
     enabled,
   });
 }
@@ -262,4 +274,5 @@ export function useInfiniteLikedPostsQuery(enabled = true) {
     enabled,
   });
 }
+
 
