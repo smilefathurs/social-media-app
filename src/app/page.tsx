@@ -213,12 +213,17 @@ export default function Home() {
             feedQuery.isSuccess &&
             feedQuery.data.pages.every((page) => page.data.items.length === 0) && (
               <div className='rounded-2xl border border-dashed border-white/15 bg-[#111014] px-6 py-12 text-center'>
-                <div className='mx-auto flex size-14 items-center justify-center rounded-full bg-purple-500/10 text-purple-300'>
+                <button
+                  type='button'
+                  onClick={handleCreatePostNavigation}
+                  aria-label='Create your first post'
+                  className='mx-auto flex size-14 cursor-pointer items-center justify-center rounded-full bg-purple-500/10 text-purple-300 transition hover:bg-purple-500/20 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-purple-400'
+                >
                   <PlusIcon />
-                </div>
-                <h2 className='mt-4 font-semibold'>Belum ada postingan</h2>
+                </button>
+                <h2 className='mt-4 font-semibold'>No Posts Yet</h2>
                 <p className='mt-2 text-sm leading-6 text-white/45'>
-                  Jadilah yang pertama berbagi cerita dengan komunitasmu.
+                  Be the first to share a story with your community.
                 </p>
               </div>
             )}
