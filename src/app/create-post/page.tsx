@@ -33,9 +33,9 @@ export default function CreatePostPage() {
     return (
       <main className='flex min-h-screen items-center justify-center bg-black px-4 text-white'>
         <section className='w-full max-w-md rounded-2xl border border-white/10 bg-[#111016] p-6 text-center'>
-          <h1 className='text-xl font-bold'>Login diperlukan</h1>
+          <h1 className='text-xl font-bold'>Login Required</h1>
           <p className='mt-2 text-sm leading-6 text-white/55'>
-            Silakan login untuk membuat postingan di Sociality22.
+            Please log in to create a post on Sociality22.
           </p>
           <Link
             href='/login'
@@ -59,7 +59,7 @@ export default function CreatePostPage() {
           className='mb-6 inline-flex cursor-pointer items-center gap-2 text-sm text-white/60 transition hover:text-purple-300'
         >
           <ArrowLeftIcon />
-          Kembali ke Timeline
+          Back to Timeline
         </button>
 
         <div className='mb-6'>
@@ -67,10 +67,10 @@ export default function CreatePostPage() {
             Create Post
           </p>
           <h1 className='mt-2 text-2xl font-bold tracking-tight sm:text-3xl'>
-            Bagikan ceritamu
+            Share Your Story
           </h1>
           <p className='mt-2 text-sm leading-6 text-white/50'>
-            Abadikan momen dan bagikan dengan komunitas Sociality22.
+            Capture the moment and share it with the Sociality22 community.
           </p>
         </div>
 

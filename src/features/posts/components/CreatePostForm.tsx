@@ -59,7 +59,7 @@ export default function CreatePostForm() {
     if (!ALLOWED_TYPES.includes(file.type)) {
       setImage(null);
       updatePreview(null);
-      setImageError('Pilih gambar JPG, PNG, atau WEBP.');
+      setImageError('Please select a JPG, PNG, or WEBP image.');
       event.target.value = '';
       return;
     }
@@ -67,7 +67,7 @@ export default function CreatePostForm() {
     if (file.size > MAX_FILE_SIZE) {
       setImage(null);
       updatePreview(null);
-      setImageError('Ukuran gambar maksimal 5 MB.');
+      setImageError('Image size must not exceed 5 MB.');
       event.target.value = '';
       return;
     }
@@ -94,11 +94,11 @@ export default function CreatePostForm() {
     setShowCaptionError(false);
 
     if (!image) {
-      setImageError('Pilih gambar terlebih dahulu.');
+      setImageError('Please select an image first.');
     }
 
     if (!caption.trim()) {
-      setCaptionError('Caption tidak boleh kosong.');
+      setCaptionError('Caption cannot be empty.');
       setShowCaptionError(true);
     }
 
@@ -130,7 +130,7 @@ export default function CreatePostForm() {
         ? createPostMutation.error.response.data
         : (createPostMutation.error.response?.data?.message ??
           createPostMutation.error.message)
-      : 'Postingan gagal dibuat. Silakan coba lagi.'
+      : 'Failed to create post. Please try again.'
     : '';
 
   return (
@@ -185,7 +185,7 @@ export default function CreatePostForm() {
             <div className='relative h-[260px] w-full overflow-hidden rounded-md bg-black sm:h-[320px]'>
               <Image
                 src={previewUrl}
-                alt='Preview postingan'
+                alt='Post image preview'
                 fill
                 unoptimized
                 sizes='(max-width: 640px) 100vw, 452px'
@@ -237,7 +237,7 @@ export default function CreatePostForm() {
             type='button'
             onClick={() => setShowCaptionError((previous) => !previous)}
             aria-label={
-              showCaptionError ? 'Sembunyikan indikator' : 'Tampilkan indikator'
+              showCaptionError ? 'Hide caption error indicator' : 'Show caption error indicator'
             }
             className='text-white/70 transition hover:text-white'
           >
@@ -307,7 +307,7 @@ export default function CreatePostForm() {
           className='mx-auto flex items-center gap-2 text-xs text-white/50 hover:text-white'
         >
           <X className='size-3' />
-          Tutup pesan error
+          Dismiss error message
         </button>
       )}
     </form>
