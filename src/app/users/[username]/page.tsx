@@ -209,7 +209,7 @@ export default function UserProfilePage() {
   const likedQuery = useUserLikedPostsQuery(
     username,
     { page: 1, limit: 20 },
-    Boolean(profile) && !profile?.isMe
+    Boolean(profile)
   );
   const savedQuery = useSavedPostsQuery(
     { page: 1, limit: 20 },
