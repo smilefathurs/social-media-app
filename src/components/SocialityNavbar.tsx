@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
@@ -561,8 +561,15 @@ export default function SocialityNavbar({
             </div>
           </div>
         )}
-        {isSearchOpen && <UserSearch onClose={() => setIsSearchOpen(false)} />}
       </header>
+
+      {/* Mobile search overlay: outside sticky header */}
+      {isSearchOpen && (
+        <div className="sm:hidden">
+          <UserSearch onClose={() => setIsSearchOpen(false)} />
+        </div>
+      )}
     </>
   );
 }
+

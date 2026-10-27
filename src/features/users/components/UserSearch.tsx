@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import Image from 'next/image';
@@ -70,7 +70,7 @@ export default function UserSearch({ onClose }: UserSearchProps) {
   const query = searchInput.trim();
   const usersQuery = useSearchUsersQuery(
     { q: query, page: 1, limit: 20 },
-    query.length > 0,
+    query.length > 0
   );
 
   const users = usersQuery.data?.data.users ?? [];
@@ -89,10 +89,8 @@ export default function UserSearch({ onClose }: UserSearchProps) {
       <form
         onSubmit={handleSubmit}
         role='search'
-        className={`flex items-center gap-3 rounded-full border border-white/10 bg-[#0A0D12] transition focus-within:border-purple-500/60 ${
-          mobile
-            ? 'h-20 flex-1 px-6'
-            : 'h-12 w-full px-4'
+        className={`flex items-center gap-1.5 rounded-full border border-white/10 bg-[#0A0D12] transition focus-within:border-purple-500/60 ${
+          mobile ? 'h-10 min-w-0 flex-1 px-3' : 'h-12 w-full px-4'
         }`}
       >
         <SearchIcon
@@ -112,7 +110,7 @@ export default function UserSearch({ onClose }: UserSearchProps) {
           autoComplete='off'
           autoFocus={mobile}
           className={`min-w-0 flex-1 appearance-none bg-transparent text-white outline-none placeholder:text-white/45 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden ${
-            mobile ? 'text-2xl' : 'text-sm'
+            mobile ? 'text-base' : 'text-sm'
           }`}
         />
 
@@ -167,52 +165,46 @@ export default function UserSearch({ onClose }: UserSearchProps) {
 
     if (users.length === 0) {
       return mobile ? (
-        <div className='absolute inset-x-0 top-1/2 -translate-y-1/2 px-4 text-center'>
-          <h2 className='text-3xl font-bold text-white'>
-            No results found
-          </h2>
-          <p className='mt-7 text-2xl text-white/60'>
-            Change your keyword
-          </p>
+        <div className='flex min-h-[calc(100dvh-104px)] flex-col items-center justify-center px-4 text-center'>
+          <p className='text-xl font-semibold text-white'>No results found</p>
+          <p className='mt-6 text-base text-white/60'>Change your keyword</p>
         </div>
       ) : (
         <div className='px-4 py-16 text-center'>
           <h2 className='text-base font-semibold text-white'>
             No results found
           </h2>
-          <p className='mt-3 text-sm text-white/60'>
-            Change your keyword
-          </p>
+          <p className='mt-3 text-sm text-white/60'>Change your keyword</p>
         </div>
       );
     }
 
     return (
-      <div className={mobile ? 'space-y-1 pb-6' : 'space-y-1 p-4'}>
+      <div className={mobile ? 'space-y-1 pb-6 pt-2' : 'space-y-1 p-4'}>
         {users.map((user) => (
           <Link
             key={user.id}
             href={`/users/${encodeURIComponent(user.username)}`}
             onClick={onClose}
             className={`flex min-w-0 items-center rounded-xl transition hover:bg-white/[0.06] ${
-              mobile ? 'gap-4 px-0 py-4' : 'gap-3 px-1 py-2.5'
+              mobile ? 'gap-3 px-0 py-3' : 'gap-3 px-1 py-2.5'
             }`}
           >
             {user.avatarUrl ? (
               <Image
                 src={user.avatarUrl}
                 alt=''
-                width={mobile ? 96 : 48}
-                height={mobile ? 96 : 48}
+                width={mobile ? 64 : 48}
+                height={mobile ? 64 : 48}
                 unoptimized
                 className={`shrink-0 rounded-full object-cover ${
-                  mobile ? 'size-24' : 'size-12'
+                  mobile ? 'size-16' : 'size-12'
                 }`}
               />
             ) : (
               <span
                 className={`flex shrink-0 items-center justify-center rounded-full bg-purple-500/15 font-semibold text-purple-300 ${
-                  mobile ? 'size-24 text-3xl' : 'size-12 text-base'
+                  mobile ? 'size-16 text-xl' : 'size-12 text-base'
                 }`}
               >
                 {(user.name || user.username).charAt(0).toUpperCase()}
@@ -222,14 +214,14 @@ export default function UserSearch({ onClose }: UserSearchProps) {
             <span className='min-w-0 flex-1'>
               <span
                 className={`block truncate font-semibold text-white ${
-                  mobile ? 'text-2xl' : 'text-sm'
+                  mobile ? 'text-base' : 'text-sm'
                 }`}
               >
                 {user.name || user.username}
               </span>
               <span
                 className={`mt-1 block truncate text-white/60 ${
-                  mobile ? 'text-2xl' : 'text-sm'
+                  mobile ? 'text-base' : 'text-sm'
                 }`}
               >
                 {user.username}
@@ -268,7 +260,7 @@ export default function UserSearch({ onClose }: UserSearchProps) {
           </button>
         </div>
 
-        <div className='relative max-h-[calc(100dvh-112px)] overflow-y-auto [scrollbar-color:#414651_#0A0D12] [scrollbar-width:thin] px-4'>
+        <div className='relative max-h-[calc(100dvh-112px)] overflow-y-auto [scrollbar-color:#414651_#0A0D12] [scrollbar-width:thin] px-8'>
           {renderSearchResults(true)}
         </div>
       </section>
